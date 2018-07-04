@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp"
+    android:background="@color/colorItem"
+    android:layout_marginBottom="10dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <TextView
+        android:id="@+id/txtNameDetail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="name + bssidnnnnnnnnnnnn"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txtSecurity"
+        android:text="Open"
+        android:textStyle="italic"
+        android:textSize="16sp"
+        android:drawableStart="@drawable/ic_lock_open_grey_500_18dp"
+        android:drawablePadding="5dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtNameDetail"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        />
+    <TextView
+        android:id="@+id/txtIP"
+        android:text="IP: 192.168.1.1"
+        android:textSize="16sp"
+        android:textColor="@android:color/holo_red_light"
+        android:drawablePadding="5dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtSecurity"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        />
+    <TextView
+        android:id="@+id/txtMAC"
+        android:text="MAC: 00:0a:95:9d:68:16"
+        android:textSize="16sp"
+        android:textColor="@android:color/holo_blue_dark"
+        android:drawablePadding="5dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtIP"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        />
+    <TextView
+        android:id="@+id/txtSignalDetail"
+        android:text="-50"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/imgSignalDetail"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="@id/imgSignalDetail"
+        app:layout_constraintEnd_toEndOf="@id/imgSignalDetail"
+        />
+
+    <ImageView
+        android:id="@+id/imgSignalDetail"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/txtMAC"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtSignalDetail" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.8" />
+
+</android.support.constraint.ConstraintLayout>
