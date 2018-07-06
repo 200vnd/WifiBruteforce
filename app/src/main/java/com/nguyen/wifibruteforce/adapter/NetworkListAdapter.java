@@ -61,7 +61,7 @@ public class NetworkListAdapter extends BaseAdapter {
         }
 
         WifiDetail wifiDetail = getItem(i);
-        holder.txtitem.setText(wifiDetail.getName());
+        holder.txtitem.setText(wifiDetail.getName() + " (" + wifiDetail.getBSSID() + ")");
         holder.imgitem.setImageResource(wifiDetail.getSignalIcon());
 
         return view;

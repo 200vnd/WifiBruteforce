@@ -1,14 +1,22 @@
 package com.nguyen.wifibruteforce;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.location.LocationManager;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -19,7 +27,7 @@ import com.nguyen.wifibruteforce.model.WifiDetail;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -31,9 +39,6 @@ public class MainActivity extends AppCompatActivity {
     ListView lvNetworkList;
     @BindView(R.id.pullToRefresh)
     SwipeRefreshLayout pullToRefresh;
-
-    ArrayList<WifiDetail> listNetwork = new ArrayList<WifiDetail>();
-    NetworkListAdapter adapter;
 
     @BindView(R.id.txtNameDetail)
     TextView txtNameDetail;
@@ -48,50 +53,126 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.imgSignalDetail)
     ImageView imgSignalDetail;
 
+    ArrayList<WifiDetail> listNetwork = new ArrayList<>();
+    NetworkListAdapter adapter;
+
+    WifiManager wifi;
+    List<ScanResult> results;
+    WifiDetail wifiDetail;
+    WifiScanReceiver wifiScanReceiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        wifi = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+        wifiScanReceiver = new WifiScanReceiver();
 
-
+        updateListNetworks();
         myPullToRefresh();
 
-
-        adapter = new NetworkListAdapter(this, listNetwork);
-        lvNetworkList.setAdapter(adapter);
-        updateListNetworks();
     }
 
     private void updateListNetworks() {
-        Ultils ultils = new Ultils();
-        ultils.checkConnect(this);
-
         listNetwork.clear();
+        adapter = new NetworkListAdapter(this, listNetwork);
+        lvNetworkList.setAdapter(adapter);
 
-        //random data for testing
-        for (int j = 0; j < 20; j++) {
-            Random random = new Random();
-            int x = random.nextInt(4) + 1;
-            WifiDetail n = new WifiDetail("wifi" + j, x);
-//            n.setSignalIcon();
-            listNetwork.add(n);
+        Ultils ultils = new Ultils();
+        ultils.checkWifiConnect(this);
+        ultils.displayLocationSettingsRequest(this,this);
+
+        LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE );
+        boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        //TODO startScan() run right after turn on gps or wifi
+        if(wifi.getWifiState() == WifiManager.WIFI_STATE_ENABLED && statusOfGPS) {
+            wifi.startScan();
         }
 
-        for (int i = 0; i < listNetwork.size(); i++) {
-            listNetwork.get(i).setSignalIcon();
+//        //random data for testing listview
+//        for (int j = 0; j < 20; j++) {
+//            Random random = new Random();
+//            int x = random.nextInt(4) + 1;
+//            WifiDetail n = new WifiDetail();
+//            n.setName("wifi" + j);
+//            n.setSignalLevel(x);
+////            n.setSignalIcon();
+//            listNetwork.add(n);
+//        }
+//
+//        for (int i = 0; i < listNetwork.size(); i++) {
+//            listNetwork.get(i).setSignalIcon();
+//        }
+
+//        Collections.sort(listNetwork, WifiDetail.COMPARE_BY_SIGNALSTRENGTH);
+//        adapter.notifyDataSetChanged();
+    }
+
+    private void scanWifi(List<ScanResult> scanResults) {
+
+        int lvl = 5;
+        for (ScanResult result: scanResults) {
+            wifiDetail = new WifiDetail();
+            int calculatedLvl = WifiManager.calculateSignalLevel(result.level, lvl);
+            wifiDetail.setSignalLevel(calculatedLvl);
+            wifiDetail.setRSSI(result.level);
+            wifiDetail.setName(result.SSID);
+            wifiDetail.setBSSID(result.BSSID);
+            wifiDetail.setSignalIcon();
+
+            listNetwork.add(wifiDetail);
         }
         Collections.sort(listNetwork, WifiDetail.COMPARE_BY_SIGNALSTRENGTH);
         adapter.notifyDataSetChanged();
+
+        //        //get current connected SSID for comparison to ScanResult
+//        WifiInfo wi = wifi.getConnectionInfo();
+//        String currentSSID = wi.getSSID();
+//
+//        if (networkList != null) {
+//            for (ScanResult network : networkList) {
+//                //check if current connected SSID
+//                if (currentSSID.equals(network.SSID)) {
+//                    //get capabilities of current connection
+//                    String capabilities =  network.capabilities;
+//
+//                    if (!(capabilities.contains("WPA2") &&
+//                            capabilities.contains("WPA") &&
+//                            capabilities.contains("WEP"))) {
+//                        wifiDetail.setCapabilities("Open Wifi");
+//                    }
+//                }
+//            }
+//        }
+    }
+
+    public void currentWifi() {
+
     }
 
     private void myPullToRefresh() {
+        //workaround listview scrolling issue with pulltorefresh
+        lvNetworkList.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if (firstVisibleItem == 0) {
+                    pullToRefresh.setEnabled(true);
+                }else
+                    pullToRefresh.setEnabled(false);
+            }
+        });
+
         pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 updateListNetworks();
-                //                pullToRefresh.setRefreshing(false);
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -106,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
-
+    //click a wifi in listview
     @OnItemClick(R.id.lvNetworkList)
     void onItemClick(int position) {
         Toast.makeText(this, "You clicked: " + adapter.getItem(position), Toast.LENGTH_LONG).show();
@@ -131,7 +212,25 @@ public class MainActivity extends AppCompatActivity {
                 .setNegativeButton("No", dialogClickListener).show();
     }
 
+    @Override
+    protected void onPause() {
+        unregisterReceiver(wifiScanReceiver);
+        super.onPause();
+    }
 
+    @Override
+    protected void onResume() {
+        registerReceiver(wifiScanReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+        super.onResume();
+    }
+
+    private class WifiScanReceiver extends BroadcastReceiver {
+        public void onReceive(Context c, Intent intent) {
+            results = wifi.getScanResults();
+            Log.d("resultsSize", "" + results.size());
+            scanWifi(results);
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

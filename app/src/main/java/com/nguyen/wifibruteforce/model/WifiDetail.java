@@ -5,12 +5,25 @@ import com.nguyen.wifibruteforce.R;
 import java.util.Comparator;
 
 public class WifiDetail {
-    private String name;    //ssid
+    private String name;
     private String BSSID;
     private int signalLevel;    //0 - 4 level
     private int RSSI;   //signal strength (dBm)
     private int signalIcon;
     private  String capabilities;   //WPA, WPA2, etc...
+    private String MAC;
+    private String IP;
+
+    public WifiDetail(String name, String BSSID, int signalLevel, int RSSI, int signalIcon, String capabilities, String MAC, String IP) {
+        this.name = name;
+        this.BSSID = BSSID;
+        this.signalLevel = signalLevel;
+        this.RSSI = RSSI;
+        this.signalIcon = signalIcon;
+        this.capabilities = capabilities;
+        this.MAC = MAC;
+        this.IP = IP;
+    }
 
     public WifiDetail(String name, String BSSID, int signalLevel, int RSSI, int signalIcon, String capabilities) {
         this.name = name;
@@ -19,17 +32,6 @@ public class WifiDetail {
         this.RSSI = RSSI;
         this.signalIcon = signalIcon;
         this.capabilities = capabilities;
-    }
-
-    public WifiDetail(String name, int signalLevel, int signalIcon) {
-        this.name = name;
-        this.signalLevel = signalLevel;
-        this.signalIcon = signalIcon;
-    }
-
-    public WifiDetail(String name, int signalLevel) {
-        this.name = name;
-        this.signalLevel = signalLevel;
     }
 
     public WifiDetail() {
@@ -79,8 +81,26 @@ public class WifiDetail {
         this.capabilities = capabilities;
     }
 
+    public String getMAC() {
+        return MAC;
+    }
+
+    public void setMAC(String MAC) {
+        this.MAC = "MAC: "+ MAC;
+    }
+
+    public String getIP() {
+        return IP;
+    }
+
+    public void setIP(String IP) {
+        this.IP = "IP: "+IP;
+    }
+
     public void setSignalIcon() {
         switch (getSignalLevel()) {
+            case 0:
+                this.signalIcon = R.drawable.ic_signal_wifi_0_bar_grey_300_48dp;
             case 1:
                 this.signalIcon = R.drawable.ic_signal_wifi_1_bar_red_a700_48dp;
                 break;

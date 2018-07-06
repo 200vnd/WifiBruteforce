@@ -8,7 +8,6 @@
     <TextView
         android:id="@+id/txtitem"
         android:hint="@string/wifiName"
-        android:textStyle="bold"
         android:textSize="20sp"
         android:gravity="start|center"
         android:layout_weight="1"
