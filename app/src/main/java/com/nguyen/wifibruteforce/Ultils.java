@@ -1,10 +1,14 @@
 package com.nguyen.wifibruteforce;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.IntentSender;
+import android.content.pm.PackageManager;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
@@ -18,10 +22,18 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 
+import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.ByteOrder;
+
+import static android.content.Context.WIFI_SERVICE;
+
+
 public class Ultils {
-    public void checkWifiConnect(final Context context) {
+    public void checkWifiConnect(final Context context, final Activity activity) {
 //        ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        final WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        final WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(WIFI_SERVICE);
 //        NetworkInfo networkInfo = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
         if (!wifiManager.isWifiEnabled()) {
@@ -33,6 +45,7 @@ public class Ultils {
                             //Yes button clicked
 //                            context.startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
                             wifiManager.setWifiEnabled(true);
+                            activity.recreate(); //restart activity
                             break;
 
                         case DialogInterface.BUTTON_NEGATIVE:
@@ -50,7 +63,17 @@ public class Ultils {
         }
     }
 
+    public boolean isConnectAccessPoint(Context context) {
+        WifiManager wifiMgr = (WifiManager) context.getApplicationContext().getSystemService(WIFI_SERVICE);
+        WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
+        if (wifiInfo.getNetworkId() == -1) {
+            return false; // Not connected to an access point
+        }else
+            return true;
+    }
+
     public void displayLocationSettingsRequest(Context context, final Activity activity) {
+        requestLocationPermission(context,activity);
         GoogleApiClient googleApiClient = new GoogleApiClient.Builder(context)
                 .addApi(LocationServices.API).build();
         googleApiClient.connect();
@@ -91,5 +114,39 @@ public class Ultils {
                 }
             }
         });
+
+    }
+
+    public void requestLocationPermission(Context context,Activity activity) {
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            activity.recreate();    //restart activity
+            return;
+        }
+//        else{
+//            // Write you code here if permission already given.
+//
+//        }
+    }
+
+    public String getWifiIpAddress(Context context) {
+        WifiManager wm = (WifiManager) context.getApplicationContext().getSystemService(WIFI_SERVICE);
+        WifiInfo wi = wm.getConnectionInfo();
+        int ipAddress = wi.getIpAddress();
+
+        ipAddress = (ByteOrder.nativeOrder().equals(ByteOrder.LITTLE_ENDIAN)) ?
+                Integer.reverseBytes(ipAddress) : ipAddress;
+
+        byte[] ipAddress2 = BigInteger.valueOf(ipAddress).toByteArray();
+        try {
+            InetAddress myAddr = InetAddress.getByAddress(ipAddress2);
+            String hostAddr = myAddr.getHostAddress();
+            return hostAddr;
+        } catch (UnknownHostException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return "";
     }
 }

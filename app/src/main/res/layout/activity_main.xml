@@ -11,6 +11,7 @@
         android:orientation="vertical">
         <include
             layout="@layout/detail_info_layout"
+            android:id="@+id/constraint"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             />

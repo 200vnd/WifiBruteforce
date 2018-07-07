@@ -7,15 +7,18 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.LocationManager;
 import android.net.wifi.ScanResult;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -46,12 +49,12 @@ public class MainActivity extends AppCompatActivity {
     TextView txtSecurity;
     @BindView(R.id.txtIP)
     TextView txtIP;
-    @BindView(R.id.txtMAC)
-    TextView txtMAC;
     @BindView(R.id.txtSignalDetail)
     TextView txtSignalDetail;
     @BindView(R.id.imgSignalDetail)
     ImageView imgSignalDetail;
+    @BindView(R.id.constraint)
+    ConstraintLayout constraint;
 
     ArrayList<WifiDetail> listNetwork = new ArrayList<>();
     NetworkListAdapter adapter;
@@ -68,6 +71,11 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         wifi = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+//        try {
+        results = wifi.getScanResults();
+//        } catch (Exception e) {
+//            Log.d("results", e.getMessage());
+//        }
         wifiScanReceiver = new WifiScanReceiver();
 
         updateListNetworks();
@@ -81,14 +89,17 @@ public class MainActivity extends AppCompatActivity {
         lvNetworkList.setAdapter(adapter);
 
         Ultils ultils = new Ultils();
-        ultils.checkWifiConnect(this);
-        ultils.displayLocationSettingsRequest(this,this);
+        ultils.checkWifiConnect(this, this);
+        ultils.displayLocationSettingsRequest(this, this);
+        boolean isConnectAP = ultils.isConnectAccessPoint(this);
+        String ip = ultils.getWifiIpAddress(this);
 
-        LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE );
+        LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         //TODO startScan() run right after turn on gps or wifi
-        if(wifi.getWifiState() == WifiManager.WIFI_STATE_ENABLED && statusOfGPS) {
+        if (wifi.getWifiState() == WifiManager.WIFI_STATE_ENABLED && statusOfGPS) {
             wifi.startScan();
+            updateCurrentWifi(isConnectAP, results,ip);
         }
 
 //        //random data for testing listview
@@ -112,11 +123,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void scanWifi(List<ScanResult> scanResults) {
 
-        int lvl = 5;
-        for (ScanResult result: scanResults) {
+//        int lvl = 5;
+        for (ScanResult result : scanResults) {
             wifiDetail = new WifiDetail();
-            int calculatedLvl = WifiManager.calculateSignalLevel(result.level, lvl);
-            wifiDetail.setSignalLevel(calculatedLvl);
+//            int calculatedLvl = WifiManager.calculateSignalLevel(result.level, lvl);
+//            wifiDetail.setSignalLevel(calculatedLvl);
+            wifiDetail.setSignalLevel(result);
             wifiDetail.setRSSI(result.level);
             wifiDetail.setName(result.SSID);
             wifiDetail.setBSSID(result.BSSID);
@@ -127,28 +139,58 @@ public class MainActivity extends AppCompatActivity {
         Collections.sort(listNetwork, WifiDetail.COMPARE_BY_SIGNALSTRENGTH);
         adapter.notifyDataSetChanged();
 
-        //        //get current connected SSID for comparison to ScanResult
-//        WifiInfo wi = wifi.getConnectionInfo();
-//        String currentSSID = wi.getSSID();
-//
-//        if (networkList != null) {
-//            for (ScanResult network : networkList) {
-//                //check if current connected SSID
-//                if (currentSSID.equals(network.SSID)) {
-//                    //get capabilities of current connection
-//                    String capabilities =  network.capabilities;
-//
-//                    if (!(capabilities.contains("WPA2") &&
-//                            capabilities.contains("WPA") &&
-//                            capabilities.contains("WEP"))) {
-//                        wifiDetail.setCapabilities("Open Wifi");
-//                    }
-//                }
-//            }
-//        }
+
     }
 
-    public void currentWifi() {
+    public void updateCurrentWifi(boolean isConnectAP, List<ScanResult> scanResults, String ip) {
+
+        if (isConnectAP) {
+            constraint.setVisibility(View.VISIBLE);
+
+            WifiInfo wifiInfo = wifi.getConnectionInfo();
+            WifiDetail wifiCurrentDetail = new WifiDetail();
+            wifiCurrentDetail.setName(wifiInfo.getSSID());
+            wifiCurrentDetail.setBSSID(wifiInfo.getBSSID());
+            wifiCurrentDetail.setRSSI(wifiInfo.getRssi());
+            wifiCurrentDetail.setSignalLevel(wifiInfo.getRssi());
+//            wifiCurrentDetail.setIP(String.valueOf(wifiInfo.getIpAddress()));
+            wifiCurrentDetail.setIP(ip);
+
+            wifiCurrentDetail.setSignalIcon();
+            if (scanResults != null) {
+                for (ScanResult network : scanResults) {
+                    //check if current connected SSID
+                    if (wifiInfo.getSSID().equals(network.SSID)) {
+                        //get capabilities of current connection
+                        String capabilities = network.capabilities;
+
+                        if ((capabilities.contains("WPA2") ||
+                                capabilities.contains("WPA") ||
+                                capabilities.contains("WEP"))) {
+                            wifiCurrentDetail.setCapabilities("WAP");
+                            Toast.makeText(getApplicationContext(), "WAP", Toast.LENGTH_LONG).show();
+                            txtSecurity.setText(wifiCurrentDetail.getCapabilities());
+                        } else {
+                            wifiCurrentDetail.setCapabilities(capabilities);
+                            txtSecurity.setText(wifiCurrentDetail.getCapabilities());
+                        }
+                    }
+                }
+            }
+
+            txtNameDetail.setText(wifiCurrentDetail.getName() + " (" + wifiCurrentDetail.getBSSID() + ")");
+            txtIP.setText(wifiCurrentDetail.getIP());
+            txtSignalDetail.setText("" + wifiCurrentDetail.getRSSI());
+            imgSignalDetail.setImageResource(wifiCurrentDetail.getSignalIcon());
+
+        }else
+            constraint.setVisibility(View.GONE);
+
+        //get current connected SSID for comparison to ScanResult
+//        WifiInfo wi = wifi.getConnectionInfo();
+//        String currentSSID = wi.getSSID();
+//        WifiDetail wifiCurrentDetail = new WifiDetail();
+
 
     }
 
@@ -164,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 if (firstVisibleItem == 0) {
                     pullToRefresh.setEnabled(true);
-                }else
+                } else
                     pullToRefresh.setEnabled(false);
             }
         });
@@ -194,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                switch (which){
+                switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
                         //Yes button clicked
                         Toast.makeText(getApplicationContext(), "yes ", Toast.LENGTH_LONG).show();
@@ -208,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Are you sure?").setPositiveButton("Yes", dialogClickListener)
+        builder.setMessage("Start brute-force this wifi?").setPositiveButton("Yes", dialogClickListener)
                 .setNegativeButton("No", dialogClickListener).show();
     }
 
@@ -226,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
 
     private class WifiScanReceiver extends BroadcastReceiver {
         public void onReceive(Context c, Intent intent) {
-            results = wifi.getScanResults();
+
             Log.d("resultsSize", "" + results.size());
             scanWifi(results);
         }

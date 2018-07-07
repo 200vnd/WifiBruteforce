@@ -3,4 +3,7 @@
     <string name="refresh">Refresh</string>
     <string name="setting">Setting</string>
     <string name="wifiName">Wifi Name</string>
+    <string name="normalBruteforce">Use normal brute-force method</string>
+    <string name="dictionary">Use dictionary method</string>
+    <string name="chooseMethod">Choose a brute-force method</string>
 </resources>

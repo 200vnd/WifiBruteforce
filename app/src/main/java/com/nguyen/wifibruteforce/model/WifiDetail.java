@@ -1,8 +1,13 @@
 package com.nguyen.wifibruteforce.model;
 
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
+
 import com.nguyen.wifibruteforce.R;
 
+import java.net.InetAddress;
 import java.util.Comparator;
+import java.util.Formatter;
 
 public class WifiDetail {
     private String name;
@@ -11,17 +16,15 @@ public class WifiDetail {
     private int RSSI;   //signal strength (dBm)
     private int signalIcon;
     private  String capabilities;   //WPA, WPA2, etc...
-    private String MAC;
     private String IP;
 
-    public WifiDetail(String name, String BSSID, int signalLevel, int RSSI, int signalIcon, String capabilities, String MAC, String IP) {
+    public WifiDetail(String name, String BSSID, int signalLevel, int RSSI, int signalIcon, String capabilities, String IP) {
         this.name = name;
         this.BSSID = BSSID;
         this.signalLevel = signalLevel;
         this.RSSI = RSSI;
         this.signalIcon = signalIcon;
         this.capabilities = capabilities;
-        this.MAC = MAC;
         this.IP = IP;
     }
 
@@ -50,7 +53,15 @@ public class WifiDetail {
     }
 
     public void setSignalLevel(int signalLevel) {
-        this.signalLevel = signalLevel;
+        int lvl = 5;
+        int calculatedLvl = WifiManager.calculateSignalLevel(signalLevel, lvl);
+        this.signalLevel = calculatedLvl;
+//        this.signalLevel = signalLevel;
+    }
+    public void setSignalLevel(ScanResult result) {
+        int lvl = 5;
+        int calculatedLvl = WifiManager.calculateSignalLevel(result.level, lvl);
+        this.signalLevel = calculatedLvl;
     }
 
     public int getSignalIcon() {
@@ -81,19 +92,12 @@ public class WifiDetail {
         this.capabilities = capabilities;
     }
 
-    public String getMAC() {
-        return MAC;
-    }
-
-    public void setMAC(String MAC) {
-        this.MAC = "MAC: "+ MAC;
-    }
-
     public String getIP() {
         return IP;
     }
 
     public void setIP(String IP) {
+//        InetAddress inetAddress = IP;
         this.IP = "IP: "+IP;
     }
 
