@@ -16,11 +16,11 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class NetworkListAdapter extends BaseAdapter {
+public class WifiListAdapter extends BaseAdapter {
     Context context;
     ArrayList<WifiDetail> data;
 
-    public NetworkListAdapter(Context context, ArrayList<WifiDetail> data) {
+    public WifiListAdapter(Context context, ArrayList<WifiDetail> data) {
         this.context = context;
         this.data = data;
     }

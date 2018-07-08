@@ -14,12 +14,10 @@
             android:id="@+id/constraint"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
+            android:visibility="gone"
             />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="5dp"
-            android:background="@android:color/darker_gray" />
+
 
         <ListView
             android:id="@+id/lvNetworkList"

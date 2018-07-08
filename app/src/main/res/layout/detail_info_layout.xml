@@ -12,7 +12,6 @@
         android:id="@+id/txtNameDetail"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="name + bssidnnnnnnnnnnnn"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
@@ -21,10 +20,9 @@
 
     <TextView
         android:id="@+id/txtSecurity"
-        android:text="capa"
         android:textStyle="italic"
+        android:textColor="@android:color/holo_blue_light"
         android:textSize="16sp"
-        android:drawableStart="@drawable/ic_lock_open_grey_500_18dp"
         android:drawablePadding="5dp"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -34,7 +32,6 @@
         />
     <TextView
         android:id="@+id/txtIP"
-        android:text="IP: 192.168.1.1"
         android:textSize="16sp"
         android:textColor="@android:color/holo_red_light"
         android:drawablePadding="5dp"
@@ -46,7 +43,6 @@
         />
     <TextView
         android:id="@+id/txtSignalDetail"
-        android:text="-50"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@id/imgSignalDetail"

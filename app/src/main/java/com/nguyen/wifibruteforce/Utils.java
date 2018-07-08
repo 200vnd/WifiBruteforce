@@ -8,8 +8,10 @@ import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -30,7 +32,10 @@ import java.nio.ByteOrder;
 import static android.content.Context.WIFI_SERVICE;
 
 
-public class Ultils {
+public class Utils {
+
+    private static final String QUOTE = "\"";
+
     public void checkWifiConnect(final Context context, final Activity activity) {
 //        ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         final WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(WIFI_SERVICE);
@@ -45,7 +50,13 @@ public class Ultils {
                             //Yes button clicked
 //                            context.startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
                             wifiManager.setWifiEnabled(true);
-                            activity.recreate(); //restart activity
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // Stop animation (This will be after 3 seconds)
+                                    activity.recreate(); //restart activity
+                                }
+                            }, 5000);
                             break;
 
                         case DialogInterface.BUTTON_NEGATIVE:
@@ -57,7 +68,7 @@ public class Ultils {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("Wifi is off!");
-            builder.setMessage("Do you want to open Wifi setting?").setPositiveButton("Yes", dialogClickListener)
+            builder.setMessage("Do you want to turn on Wifi now?").setPositiveButton("Yes", dialogClickListener)
                     .setNegativeButton("No", dialogClickListener).show();
 
         }
@@ -109,7 +120,7 @@ public class Ultils {
                         }
                         break;
                     case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        Log.i(TAG, "Location settings are inadequate, and cannot be fixed here. Dialog not created.");
+                        Log.i(TAG, "Location settings are inadequate, and cannot be fixed here. DialogActivity not created.");
                         break;
                 }
             }
@@ -134,7 +145,7 @@ public class Ultils {
         WifiInfo wi = wm.getConnectionInfo();
         int ipAddress = wi.getIpAddress();
 
-        ipAddress = (ByteOrder.nativeOrder().equals(ByteOrder.LITTLE_ENDIAN)) ?
+        ipAddress = (ByteOrder.nativeOrder().equals(ByteOrder.LITTLE_ENDIAN)) ? //reverse order
                 Integer.reverseBytes(ipAddress) : ipAddress;
 
         byte[] ipAddress2 = BigInteger.valueOf(ipAddress).toByteArray();
@@ -148,5 +159,10 @@ public class Ultils {
         }
 
         return "";
+    }
+
+    //remove "" in ssid
+    public static String convertSSID( String ssid) {
+        return ssid.replace(QUOTE,"");
     }
 }

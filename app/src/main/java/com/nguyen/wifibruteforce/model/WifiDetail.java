@@ -4,10 +4,9 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 
 import com.nguyen.wifibruteforce.R;
+import com.nguyen.wifibruteforce.Utils;
 
-import java.net.InetAddress;
 import java.util.Comparator;
-import java.util.Formatter;
 
 public class WifiDetail {
     private String name;
@@ -45,7 +44,7 @@ public class WifiDetail {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = Utils.convertSSID(name);
     }
 
     public int getSignalLevel() {
