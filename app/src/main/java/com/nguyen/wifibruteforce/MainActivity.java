@@ -34,6 +34,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnItemClick;
+import butterknife.OnItemLongClick;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     WifiListAdapter adapter;
 
     WifiManager wifi;
-    List<ScanResult> results;
+
     WifiDetail wifiDetail;
     WifiScanReceiver wifiScanReceiver;
 
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         //TODO dua listview vao asynctask: hien progress bar den khi listview load xong, constraint visible cung luc listview load xong
         //bo thoi gian cho pulltorefresh
         wifi = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
-        results = wifi.getScanResults();
+
         wifiScanReceiver = new WifiScanReceiver();
         constraint.setVisibility(View.VISIBLE);
 
@@ -82,9 +83,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateListNetworks() {
-        listNetwork.clear();
-        adapter = new WifiListAdapter(this, listNetwork);
-        lvNetworkList.setAdapter(adapter);
+
 
         Utils utils = new Utils();
         utils.checkWifiConnect(this, this);
@@ -97,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         //TODO startScan() run right after turn on gps or wifi
         if (wifi.getWifiState() == WifiManager.WIFI_STATE_ENABLED && statusOfGPS) {
             wifi.startScan();
-            updateCurrentWifi(isConnectAP, results,ip);
+            updateCurrentWifi(isConnectAP, ip);
 //            updateCurrentWifi(scanResults);
 
         }
@@ -122,6 +121,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void scanWifi(List<ScanResult> scanResults) {
+        listNetwork.clear();
+        adapter = new WifiListAdapter(this, listNetwork);
+        lvNetworkList.setAdapter(adapter);
 
         for (ScanResult result : scanResults) {
             wifiDetail = new WifiDetail();
@@ -140,10 +142,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void updateCurrentWifi( boolean isConnectAP, List<ScanResult> scanResults, String ip) {
-        Utils utils2 = new Utils();
+    public void updateCurrentWifi( boolean isConnectAP, String ip) {
+//        Utils utils2 = new Utils();
 //        boolean isConnectAP = utils2.isConnectAccessPoint(this);
 //        String ip = utils2.getWifiIpAddress(this);
+        List<ScanResult> scanResults = wifi.getScanResults();
         if (isConnectAP) {
             constraint.setVisibility(View.VISIBLE); //show view of current connected wifi info
 
@@ -254,6 +257,12 @@ public class MainActivity extends AppCompatActivity {
                 .setNegativeButton("No", dialogClickListener).show();
     }
 
+    @OnItemLongClick(R.id.lvNetworkList)
+    boolean onItemLongClick(int position) {
+        Toast.makeText(getApplicationContext(), "Long click " + position, Toast.LENGTH_LONG).show();
+        return true; //if return false, the onItemClick() will be invoked when touch up
+    }
+
     @Override
     protected void onPause() {
         unregisterReceiver(wifiScanReceiver);
@@ -269,6 +278,7 @@ public class MainActivity extends AppCompatActivity {
     private class WifiScanReceiver extends BroadcastReceiver {
         public void onReceive(Context c, Intent intent) {
 //            Log.d("resultsSize", "" + results.size());
+            List<ScanResult> results = wifi.getScanResults();
             scanWifi(results);
         }
     }
