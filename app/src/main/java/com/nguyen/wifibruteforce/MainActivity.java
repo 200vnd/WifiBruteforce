@@ -1,5 +1,6 @@
 package com.nguyen.wifibruteforce;
 
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -7,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.LocationManager;
 import android.net.wifi.ScanResult;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -19,6 +21,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -64,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
     WifiDetail wifiDetail;
     WifiScanReceiver wifiScanReceiver;
 
+    EditText pass;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,18 +91,14 @@ public class MainActivity extends AppCompatActivity {
     private void updateListNetworks() {
 
 
-        Utils utils = new Utils();
-        utils.checkWifiConnect(this, this);
-        utils.displayLocationSettingsRequest(this, this);
-        boolean isConnectAP = utils.isConnectAccessPoint(this);
-        String ip = utils.getWifiIpAddress(this);
+
 
         LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         //TODO startScan() run right after turn on gps or wifi
         if (wifi.getWifiState() == WifiManager.WIFI_STATE_ENABLED && statusOfGPS) {
             wifi.startScan();
-            updateCurrentWifi(isConnectAP, ip);
+
 //            updateCurrentWifi(scanResults);
 
         }
@@ -142,11 +144,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void updateCurrentWifi( boolean isConnectAP, String ip) {
-//        Utils utils2 = new Utils();
-//        boolean isConnectAP = utils2.isConnectAccessPoint(this);
-//        String ip = utils2.getWifiIpAddress(this);
-        List<ScanResult> scanResults = wifi.getScanResults();
+    public void updateCurrentWifi( List<ScanResult> scanResults) {
+        Utils utils = new Utils();
+        utils.checkWifiConnect(this, this);
+        utils.displayLocationSettingsRequest(this, this);
+        boolean isConnectAP = utils.isConnectAccessPoint(this);
+        String ip = utils.getWifiIpAddress(this);
+
         if (isConnectAP) {
             constraint.setVisibility(View.VISIBLE); //show view of current connected wifi info
 
@@ -216,6 +220,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onRefresh() {
                 updateListNetworks();
+
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -234,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
 
     //click a wifi in listview
     @OnItemClick(R.id.lvNetworkList)
-    void onItemClick(int position) {
+    void onItemClick(final int position) {
         Toast.makeText(this, "You clicked: " + adapter.getItem(position), Toast.LENGTH_LONG).show();
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
@@ -243,6 +248,7 @@ public class MainActivity extends AppCompatActivity {
                     case DialogInterface.BUTTON_POSITIVE:
                         //Yes button clicked
                         Toast.makeText(getApplicationContext(), "yes ", Toast.LENGTH_LONG).show();
+                        connectToWifi(adapter.getItem(position).getName());
                         break;
 
                     case DialogInterface.BUTTON_NEGATIVE:
@@ -277,8 +283,8 @@ public class MainActivity extends AppCompatActivity {
 
     private class WifiScanReceiver extends BroadcastReceiver {
         public void onReceive(Context c, Intent intent) {
-//            Log.d("resultsSize", "" + results.size());
             List<ScanResult> results = wifi.getScanResults();
+            updateCurrentWifi(results);
             scanWifi(results);
         }
     }
@@ -303,4 +309,45 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+
+
+    private void finallyConnect(String networkPass, String networkSSID) {
+        WifiConfiguration wifiConfig = new WifiConfiguration();
+        wifiConfig.SSID = String.format("\"%s\"", networkSSID);
+        wifiConfig.preSharedKey = String.format("\"%s\"", networkPass);
+
+        // remember id
+        int netId = wifi.addNetwork(wifiConfig);
+        wifi.disconnect();
+        wifi.enableNetwork(netId, true);
+        wifi.reconnect();
+
+        WifiConfiguration conf = new WifiConfiguration();
+        conf.SSID = "\"\"" + networkSSID + "\"\"";
+        conf.preSharedKey = "\"" + networkPass + "\"";
+        wifi.addNetwork(conf);
+    }
+
+    private void connectToWifi(final String wifiSSID) {
+        final Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.connect);
+        dialog.setTitle("Connect to Network");
+        TextView textSSID = (TextView) dialog.findViewById(R.id.textSSID1);
+
+        Button dialogButton = (Button) dialog.findViewById(R.id.okButton);
+        pass = (EditText) dialog.findViewById(R.id.textPassword);
+        textSSID.setText(wifiSSID);
+
+        // if button is clicked, connect to the network;
+        dialogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String checkPassword = pass.getText().toString();
+                finallyConnect(checkPassword, wifiSSID);
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
 }
