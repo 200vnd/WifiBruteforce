@@ -36,7 +36,7 @@ public class Utils {
 
     private static final String QUOTE = "\"";
 
-    public void checkWifiConnect(final Context context, final Activity activity) {
+    public static void checkWifiConnect(final Context context, final Activity activity) {
 //        ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         final WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(WIFI_SERVICE);
 //        NetworkInfo networkInfo = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
@@ -74,7 +74,7 @@ public class Utils {
         }
     }
 
-    public boolean isConnectAccessPoint(Context context) {
+    public static boolean isConnectAccessPoint(Context context) {
         WifiManager wifiMgr = (WifiManager) context.getApplicationContext().getSystemService(WIFI_SERVICE);
         WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
         if (wifiInfo.getNetworkId() == -1) {
@@ -83,7 +83,7 @@ public class Utils {
             return true;
     }
 
-    public void displayLocationSettingsRequest(Context context, final Activity activity) {
+    public static void displayLocationSettingsRequest(Context context, final Activity activity) {
         requestLocationPermission(context,activity);
         GoogleApiClient googleApiClient = new GoogleApiClient.Builder(context)
                 .addApi(LocationServices.API).build();
@@ -128,10 +128,10 @@ public class Utils {
 
     }
 
-    public void requestLocationPermission(Context context,Activity activity) {
+    public static void requestLocationPermission(Context context, Activity activity) {
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-            activity.recreate();    //restart activity
+//            activity.recreate();    //restart activity
             return;
         }
 //        else{
@@ -140,7 +140,7 @@ public class Utils {
 //        }
     }
 
-    public String getWifiIpAddress(Context context) {
+    public static String getWifiIpAddress(Context context) {
         WifiManager wm = (WifiManager) context.getApplicationContext().getSystemService(WIFI_SERVICE);
         WifiInfo wi = wm.getConnectionInfo();
         int ipAddress = wi.getIpAddress();
