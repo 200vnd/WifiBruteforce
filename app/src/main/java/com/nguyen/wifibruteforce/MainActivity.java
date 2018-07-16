@@ -291,34 +291,34 @@ public class MainActivity extends AppCompatActivity {
             updateCurrentWifi(results);
             scanWifi(results);
 
-            System.out.println("MYYYYRECEIVEDDDDDDDDDDDD");
-            System.out.println(WifiManager.NETWORK_STATE_CHANGED_ACTION + "/" +WifiManager.EXTRA_NETWORK_INFO);
-
-
-            NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
-            if(info != null && info.isConnected()) {
-                // Do your work.
-                System.out.println("CONNECTEDDDDDDDDDDDDDDDDDDD");
-                // e.g. To check the Network Name or other info:
-
-            }
-            System.out.println(intent.getAction()+"////");
-            if(intent.getAction().equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
-                NetworkInfo networkInfo =
-                        intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
-                if(networkInfo.isConnected()) {
-                    // Wifi is connected
-                    Log.d("Inetify", "Wifi is connected: " + String.valueOf(networkInfo));
-                }
-            } else if(intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
-                NetworkInfo networkInfo =
-                        intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
-                if(networkInfo.getType() == ConnectivityManager.TYPE_WIFI &&
-                        ! networkInfo.isConnected()) {
-                    // Wifi is disconnected
-                    Log.d("Inetify", "Wifi is disconnected: " + String.valueOf(networkInfo));
-                }
-            }
+//            System.out.println("MYYYYRECEIVEDDDDDDDDDDDD");
+//            System.out.println(WifiManager.NETWORK_STATE_CHANGED_ACTION + "/" +WifiManager.EXTRA_NETWORK_INFO);
+//
+//
+//            NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+//            if(info != null && info.isConnected()) {
+//                // Do your work.
+//                System.out.println("CONNECTEDDDDDDDDDDDDDDDDDDD");
+//                // e.g. To check the Network Name or other info:
+//
+//            }
+//            System.out.println(intent.getAction()+"////");
+//            if(intent.getAction().equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
+//                NetworkInfo networkInfo =
+//                        intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+//                if(networkInfo.isConnected()) {
+//                    // Wifi is connected
+//                    Log.d("Inetify", "Wifi is connected: " + String.valueOf(networkInfo));
+//                }
+//            } else if(intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+//                NetworkInfo networkInfo =
+//                        intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+//                if(networkInfo.getType() == ConnectivityManager.TYPE_WIFI &&
+//                        ! networkInfo.isConnected()) {
+//                    // Wifi is disconnected
+//                    Log.d("Inetify", "Wifi is disconnected: " + String.valueOf(networkInfo));
+//                }
+//            }
         }
     }
 
@@ -355,10 +355,10 @@ public class MainActivity extends AppCompatActivity {
         wifi.enableNetwork(netId, true);
         wifi.reconnect();
 
-        WifiConfiguration conf = new WifiConfiguration();
-        conf.SSID = "\"\"" + networkSSID + "\"\"";
-        conf.preSharedKey = "\"" + networkPass + "\"";
-        wifi.addNetwork(conf);
+//        WifiConfiguration conf = new WifiConfiguration();
+//        conf.SSID = "\"\"" + networkSSID + "\"\"";
+//        conf.preSharedKey = "\"" + networkPass + "\"";
+//        wifi.addNetwork(conf);
 
     }
 
@@ -394,7 +394,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Integer doInBackground(String... strings) {
             FindPassword bruteforce = new FindPassword();
-            String[] test = {"88888888","123456789","thecoffeehouse"};
+            String[] test = {"88888888","123456789","222222","444444444","deophaihoi","thecoffeehouse"};
 
 //            for (int length = bruteforce.min; length < bruteforce.max; length++) { // Change bruteforce.min and bruteforce.max for number of characters to bruteforce.
             for (int i = 0; i < test.length; i++){
@@ -404,19 +404,19 @@ public class MainActivity extends AppCompatActivity {
 //                finallyConnect(bruteforce.pass,strings[0]);
                 finallyConnect(testPass,strings[0]);
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(8000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
 
 //                if (finallyConnect(bruteforce.pass,strings[0])) {
-//                WifiInfo wifiInfo = wifi.getConnectionInfo();
+                WifiInfo wifiInfo = wifi.getConnectionInfo();
 //                SupplicantState s = wifiInfo.getSupplicantState();
 //                String ss = SupplicantState.ASSOCIATED.toString();
-//                if (Utils.isConnectAccessPoint(getApplicationContext()) ){
-//                    Log.d("pz", Utils.convertSSID(wifiInfo.getSSID()) + "/" +strings[0]+ " /pass: "+testPass);
-//                    break;
-//                }
+                if (Utils.isConnectAccessPoint(getApplicationContext()) ){
+                    Log.d("pz", Utils.convertSSID(wifiInfo.getSSID()) + "/" +strings[0]+ " /pass: "+testPass);
+                    break;
+                }
 
             }
 
