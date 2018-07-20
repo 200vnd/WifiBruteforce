@@ -109,7 +109,7 @@ public class BruteForceTask extends AsyncTask<String, Integer, Integer> {
     protected void onPostExecute(Integer integer) {
         super.onPostExecute(integer);
 //        progressDialog.dismiss();
-        Toast.makeText(activity.getApplicationContext(), "Password found: " + foundPass, Toast.LENGTH_LONG).show();
+        Toast.makeText(activity.getApplicationContext(), R.string.pass_found + foundPass, Toast.LENGTH_LONG).show();
         activity.finish();
     }
 }

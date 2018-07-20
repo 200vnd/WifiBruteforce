@@ -25,6 +25,7 @@ public class DialogMethodActivity extends Activity {
     Button btnMethodCancel;
 
     String ssid;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,18 +40,19 @@ public class DialogMethodActivity extends Activity {
 
     @OnClick(R.id.txtMethodBF)
     public void onTxtMethodBFClicked() {
-        Toast.makeText(getApplicationContext(),"Brute force", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "Brute force", Toast.LENGTH_LONG).show();
         Intent i = new Intent(DialogMethodActivity.this, DialogActivity.class);
         i.putExtra("SSID", ssid);
         startActivity(i);
+        finish();
     }
 
     @OnClick(R.id.txtMethodDic)
     public void onTxtMethodDicClicked() {
-        Toast.makeText(getApplicationContext(),"Dictionary", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "Dictionary", Toast.LENGTH_LONG).show();
         Log.d("pz", "dma ssid: " + ssid);
 
-
+        //choose file from storage (use library)
         StorageChooser chooser = new StorageChooser.Builder()
                 .withActivity(DialogMethodActivity.this)
                 .withMemoryBar(true)
@@ -70,14 +72,14 @@ public class DialogMethodActivity extends Activity {
 
             }
         });
+        finish();
     }
 
     @OnClick(R.id.btnMethodCancel)
     public void onBtnMethodCancelClicked() {
-        Toast.makeText(getApplicationContext(),"Cancel", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "Cancel", Toast.LENGTH_LONG).show();
         finish();
     }
-
 
 
 }
