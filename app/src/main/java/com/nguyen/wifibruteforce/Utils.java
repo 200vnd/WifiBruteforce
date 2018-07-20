@@ -15,6 +15,7 @@ import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.codekidlabs.storagechooser.StorageChooser;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -184,5 +185,25 @@ public class Utils {
 //        conf.preSharedKey = "\"" + networkPass + "\"";
 //        wifi.addNetwork(conf);
 
+    }
+
+    public static String filePick(Activity activity) {
+        String path ;
+        StorageChooser chooser = new StorageChooser.Builder()
+                .withActivity(activity)
+                .withMemoryBar(true)
+                .withFragmentManager(activity.getFragmentManager())
+                .allowCustomPath(true)
+                .setType(StorageChooser.DIRECTORY_CHOOSER)
+                .build();
+        chooser.show();
+        chooser.setOnSelectListener(new StorageChooser.OnSelectListener() {
+            @Override
+            public void onSelect(String s) {
+                Log.e("SELECTED_PATH", s);
+
+            }
+        });
+        return null;
     }
 }

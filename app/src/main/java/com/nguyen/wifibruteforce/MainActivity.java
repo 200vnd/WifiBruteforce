@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -33,6 +34,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.codekidlabs.storagechooser.StorageChooser;
+import com.codekidlabs.storagechooser.utils.DiskUtil;
 import com.nguyen.wifibruteforce.adapter.WifiListAdapter;
 import com.nguyen.wifibruteforce.model.WifiDetail;
 
@@ -239,7 +242,7 @@ public class MainActivity extends AppCompatActivity {
     //click a wifi in listview
     @OnItemClick(R.id.lvNetworkList)
     void onItemClick(final int position) {
-        Toast.makeText(this, "You clicked: " + adapter.getItem(position), Toast.LENGTH_LONG).show();
+//        Toast.makeText(this, "You clicked: " + adapter.getItem(position), Toast.LENGTH_LONG).show();
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -249,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
 //                        Toast.makeText(getApplicationContext(), "yes ", Toast.LENGTH_LONG).show();
 //                        connectToWifi(adapter.getItem(position).getName());
 //                        doStart(adapter.getItem(position).getName());
-                        Intent intent = new Intent(MainActivity.this, DialogActivity.class);
+                        Intent intent = new Intent(MainActivity.this, DialogMethodActivity.class);
                         intent.putExtra("SSID",adapter.getItem(position).getName());
                         startActivity(intent);
                         Log.d("pz", "ssid: " + adapter.getItem(position).getName());
@@ -263,14 +266,16 @@ public class MainActivity extends AppCompatActivity {
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Start brute-force this wifi?").setPositiveButton("Yes", dialogClickListener)
-                .setNegativeButton("No", dialogClickListener).show();
+        builder.setMessage("Start brute-force this wifi?")
+                .setPositiveButton("Yes", dialogClickListener)
+                .setNegativeButton("No", dialogClickListener)
+                .show();
     }
 
     @OnItemLongClick(R.id.lvNetworkList)
     boolean onItemLongClick(int position) {
         Toast.makeText(getApplicationContext(), "Long click " + position, Toast.LENGTH_LONG).show();
-//        doStop();
+
         return true; //if return false, the onItemClick() will be invoked when touch up
     }
 

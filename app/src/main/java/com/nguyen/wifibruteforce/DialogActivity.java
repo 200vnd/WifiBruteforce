@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,9 +27,16 @@ public class DialogActivity extends Activity {
         this.setFinishOnTouchOutside(false);
 
         Intent intent = getIntent();
-        String ssid = intent.getStringExtra("SSID");
+        String ssid1 = intent.getStringExtra("SSID");
+        String ssid2 = intent.getStringExtra("SSID");
 
-        doStart(ssid);
+        if (getIntent().hasExtra("PATH")) {
+            Toast.makeText(getApplicationContext(), "dic", Toast.LENGTH_LONG).show();
+            Log.d("z", intent.getStringExtra("PATH"));
+
+        } else
+            Toast.makeText(getApplicationContext(), "bf", Toast.LENGTH_LONG).show();
+//        doStart(ssid);
     }
 
 
