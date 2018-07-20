@@ -6,4 +6,10 @@
     <string name="normalBruteforce">Use normal brute-force method</string>
     <string name="dictionary">Use dictionary method</string>
     <string name="chooseMethod">Choose a brute-force method</string>
+    <string name="finding_password_please_wait">Finding password, please wait...</string>
+    <string name="tried_passwords">Tried Passwords:</string>
+    <string name="stop">Stop</string>
+    <string name="cancel">Cancel</string>
+    <string name="brute_force_with_all_posible_passwords">Brute force with all posible passwords</string>
+    <string name="brute_force_using_dictionary">Brute force using dictionary</string>
 </resources>

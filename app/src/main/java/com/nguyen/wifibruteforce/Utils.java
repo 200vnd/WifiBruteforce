@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
@@ -164,5 +165,24 @@ public class Utils {
     //remove "" in ssid
     public static String convertSSID( String ssid) {
         return ssid.replace(QUOTE,"");
+    }
+
+    public static void finallyConnect(String networkPass, String networkSSID, Activity activity) {
+        WifiManager wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(WIFI_SERVICE);
+        WifiConfiguration wifiConfig = new WifiConfiguration();
+        wifiConfig.SSID = String.format("\"%s\"", networkSSID);
+        wifiConfig.preSharedKey = String.format("\"%s\"", networkPass);
+
+        // remember id
+        int netId = wifiManager.addNetwork(wifiConfig);
+        wifiManager.disconnect();
+        wifiManager.enableNetwork(netId, true);
+        wifiManager.reconnect();
+
+//        WifiConfiguration conf = new WifiConfiguration();
+//        conf.SSID = "\"\"" + networkSSID + "\"\"";
+//        conf.preSharedKey = "\"" + networkPass + "\"";
+//        wifi.addNetwork(conf);
+
     }
 }
