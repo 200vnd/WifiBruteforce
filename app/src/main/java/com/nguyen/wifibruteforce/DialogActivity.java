@@ -43,11 +43,9 @@ public class DialogActivity extends Activity {
 
             String path = intent.getStringExtra("PATH");
             ArrayList<String> ListPass = read(path);
-            Log.d("pz", "a: "+ListPass.get(4));
 
-            doStart(ssid,ListPass);
+            doStart(ssid, ListPass);
 
-//            String[] sss = a.toArray(new String[0]);
         } else
             Toast.makeText(getApplicationContext(), "bf", Toast.LENGTH_LONG).show();
 //        doStart(ssid);
@@ -57,25 +55,23 @@ public class DialogActivity extends Activity {
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 ArrayList arrPass = new ArrayList(Arrays.asList(br.lines().toArray()));
-                Log.d("pz", "loaded[5]: " + arrPass.get(5));
                 br.close();
                 return arrPass;
-            }else {
+            } else {
                 String line;
                 ArrayList arrPass = new ArrayList();
                 while ((line = br.readLine()) != null) {
                     arrPass.add(line);
                 }
-                Log.d("pz", "loaded[0]: " + arrPass.get(5));
                 br.close();
                 return arrPass;
             }
         } catch (FileNotFoundException e) {
-            Log.e("read_file","not found");
-            Toast.makeText(getApplicationContext(), R.string.file_not_found, Toast.LENGTH_LONG).show();
+            Log.e("readFile", "not found");
+            Toast.makeText(getApplicationContext(), getString(R.string.file_not_found), Toast.LENGTH_LONG).show();
         } catch (IOException e) {
-            Log.e("read_file","IOEx");
-            Toast.makeText(getApplicationContext(), R.string.IOException, Toast.LENGTH_LONG).show();
+            Log.e("readFile", "IOEx");
+            Toast.makeText(getApplicationContext(), getString(R.string.IOException), Toast.LENGTH_LONG).show();
         }
         return null;
     }

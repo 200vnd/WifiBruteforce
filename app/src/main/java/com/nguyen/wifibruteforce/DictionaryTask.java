@@ -89,7 +89,7 @@ public class DictionaryTask extends AsyncTask<String, Integer, Integer> {
     @Override
     protected void onPostExecute(Integer integer) {
         super.onPostExecute(integer);
-        Toast.makeText(activity.getApplicationContext(), R.string.pass_found + foundPass, Toast.LENGTH_LONG).show();
+        Toast.makeText(activity.getApplicationContext(), activity.getString(R.string.pass_found) + foundPass, Toast.LENGTH_LONG).show();
         activity.finish();
     }
 }

@@ -52,6 +52,8 @@ public class DialogMethodActivity extends Activity {
         Toast.makeText(getApplicationContext(), "Dictionary", Toast.LENGTH_LONG).show();
         Log.d("pz", "dma ssid: " + ssid);
 
+        Utils.requestStoragePermission(DialogMethodActivity.this);
+
         //choose file from storage (use library)
         StorageChooser chooser = new StorageChooser.Builder()
                 .withActivity(DialogMethodActivity.this)
@@ -69,10 +71,10 @@ public class DialogMethodActivity extends Activity {
                 i.putExtra("SSID", ssid);
                 i.putExtra("PATH", s);
                 startActivity(i);
-
+                finish();
             }
         });
-        finish();
+
     }
 
     @OnClick(R.id.btnMethodCancel)

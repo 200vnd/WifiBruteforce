@@ -14,5 +14,5 @@
     <string name="brute_force_using_dictionary">Brute force using dictionary</string>
     <string name="file_not_found">File not found!</string>
     <string name="IOException">Error, Please try again!</string>
-    <string name="pass_found">Password found:</string>
+    <string name="pass_found">Password found: </string>
 </resources>

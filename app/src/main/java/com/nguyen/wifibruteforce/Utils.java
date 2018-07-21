@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
@@ -47,7 +48,7 @@ public class Utils {
             DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    switch (which){
+                    switch (which) {
                         case DialogInterface.BUTTON_POSITIVE:
                             //Yes button clicked
 //                            context.startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
@@ -81,12 +82,12 @@ public class Utils {
         WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
         if (wifiInfo.getNetworkId() == -1) {
             return false; // Not connected to an access point
-        }else
+        } else
             return true;
     }
 
     public static void displayLocationSettingsRequest(Context context, final Activity activity) {
-        requestLocationPermission(context,activity);
+        requestLocationPermission(context, activity);
         GoogleApiClient googleApiClient = new GoogleApiClient.Builder(context)
                 .addApi(LocationServices.API).build();
         googleApiClient.connect();
@@ -131,15 +132,23 @@ public class Utils {
     }
 
     public static void requestLocationPermission(Context context, Activity activity) {
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (
+//                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED
+                        && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-//            activity.recreate();    //restart activity
-            return;
         }
-//        else{
-//            // Write you code here if permission already given.
-//
-//        }
+    }
+
+    public static void requestStoragePermission(Activity activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 199);
+        }
     }
 
     public static String getWifiIpAddress(Context context) {
@@ -156,7 +165,6 @@ public class Utils {
             String hostAddr = myAddr.getHostAddress();
             return hostAddr;
         } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -164,8 +172,8 @@ public class Utils {
     }
 
     //remove "" in ssid
-    public static String convertSSID( String ssid) {
-        return ssid.replace(QUOTE,"");
+    public static String convertSSID(String ssid) {
+        return ssid.replace(QUOTE, "");
     }
 
     public static void finallyConnect(String networkPass, String networkSSID, Activity activity) {
@@ -183,27 +191,9 @@ public class Utils {
 //        WifiConfiguration conf = new WifiConfiguration();
 //        conf.SSID = "\"\"" + networkSSID + "\"\"";
 //        conf.preSharedKey = "\"" + networkPass + "\"";
-//        wifi.addNetwork(conf);
+//        wifiManager.addNetwork(conf);
+//
 
     }
 
-    public static String filePick(Activity activity) {
-        String path ;
-        StorageChooser chooser = new StorageChooser.Builder()
-                .withActivity(activity)
-                .withMemoryBar(true)
-                .withFragmentManager(activity.getFragmentManager())
-                .allowCustomPath(true)
-                .setType(StorageChooser.DIRECTORY_CHOOSER)
-                .build();
-        chooser.show();
-        chooser.setOnSelectListener(new StorageChooser.OnSelectListener() {
-            @Override
-            public void onSelect(String s) {
-                Log.e("SELECTED_PATH", s);
-
-            }
-        });
-        return null;
-    }
 }
