@@ -11,6 +11,8 @@ import android.widget.Toast;
 
 import com.codekidlabs.storagechooser.StorageChooser;
 
+import java.util.ArrayList;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -49,17 +51,18 @@ public class DialogMethodActivity extends Activity {
 
     @OnClick(R.id.txtMethodDic)
     public void onTxtMethodDicClicked() {
-        Toast.makeText(getApplicationContext(), "Dictionary", Toast.LENGTH_LONG).show();
-        Log.d("pz", "dma ssid: " + ssid);
+        Toast.makeText(getApplicationContext(), "Choose a dictionary (.txt)", Toast.LENGTH_LONG).show();
 
         Utils.requestStoragePermission(DialogMethodActivity.this);
-
+        ArrayList<String> t = new ArrayList<>();    //custom file type
+        t.add("txt");
         //choose file from storage (use library)
         StorageChooser chooser = new StorageChooser.Builder()
                 .withActivity(DialogMethodActivity.this)
                 .withMemoryBar(true)
                 .withFragmentManager(getFragmentManager())
                 .allowCustomPath(true)
+                .customFilter(t)
                 .setType(StorageChooser.FILE_PICKER)
                 .build();
         chooser.show();
@@ -79,7 +82,7 @@ public class DialogMethodActivity extends Activity {
 
     @OnClick(R.id.btnMethodCancel)
     public void onBtnMethodCancelClicked() {
-        Toast.makeText(getApplicationContext(), "Cancel", Toast.LENGTH_LONG).show();
+//        Toast.makeText(getApplicationContext(), "Cancel", Toast.LENGTH_LONG).show();
         finish();
     }
 

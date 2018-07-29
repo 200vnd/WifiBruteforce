@@ -2,6 +2,7 @@ package com.nguyen.wifibruteforce;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,6 +26,7 @@ public class DialogActivity extends Activity {
     @BindView(R.id.btnCancel)
     Button btnStop;
     DictionaryTask hackingTask;
+    int flag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,20 +39,25 @@ public class DialogActivity extends Activity {
         Intent intent = getIntent();
         String ssid = intent.getStringExtra("SSID");
 
-        if (getIntent().hasExtra("PATH")) {
+
+        if (getIntent().hasExtra("PATH")) {             //dictionary method
             Toast.makeText(getApplicationContext(), "dic", Toast.LENGTH_LONG).show();
-            Log.d("pz", intent.getStringExtra("PATH"));
+            Log.d("running", intent.getStringExtra("PATH"));
 
             String path = intent.getStringExtra("PATH");
             ArrayList<String> ListPass = read(path);
 
-            doStart(ssid, ListPass);
+            flag = 0;
+            doStart(ssid, ListPass, flag);
 
-        } else
+        } else {                //brute force method
+            flag = 1;
+            doStart(ssid, null, flag);
             Toast.makeText(getApplicationContext(), "bf", Toast.LENGTH_LONG).show();
-//        doStart(ssid);
+        }
     }
 
+    //2 types of reading file to arraylist
     private ArrayList read(String path) {
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -76,17 +83,30 @@ public class DialogActivity extends Activity {
         return null;
     }
 
-    private void doStart(String ssid, ArrayList<String> listPass) {
-        hackingTask = new DictionaryTask(DialogActivity.this);
-        hackingTask.setArrPass(listPass);
-        hackingTask.execute(ssid);
+    private void doStart(String ssid, ArrayList<String> listPass, int flag) {
+        if (flag == 0) {
+            hackingTask = new DictionaryTask(DialogActivity.this);
+            hackingTask.setArrPass(listPass);
+            hackingTask.execute(ssid);
+        } else if (flag == 1) {
+            Log.d("running", "method bf " + ssid);
 
+        } else {
+            Log.e("running", "some thing wrong");
+
+        }
     }
 
-    private void doStop() {
-        hackingTask.cancel(true);
-        if (hackingTask.isCancelled()) {
-//            Log.d("pz", "task cancel");
+    private void doStop(int flag) {
+        if (flag == 0) {
+            if (hackingTask != null && hackingTask.getStatus() != AsyncTask.Status.FINISHED)
+                hackingTask.cancel(true);
+            if (hackingTask.isCancelled()) {
+//            Log.d("running", "task cancel");
+                finish();
+            }
+        } else {
+            Log.d("running", "doStop flag !=0");
             finish();
         }
     }
@@ -94,6 +114,6 @@ public class DialogActivity extends Activity {
 
     @OnClick(R.id.btnCancel)
     public void onViewClicked() {
-        doStop();
+        doStop(flag);
     }
 }

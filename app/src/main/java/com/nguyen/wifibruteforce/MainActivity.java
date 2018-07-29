@@ -104,9 +104,6 @@ public class MainActivity extends AppCompatActivity {
         //TODO startScan() run right after turn on gps or wifi
         if (wifi.getWifiState() == WifiManager.WIFI_STATE_ENABLED && statusGPS) {
             wifi.startScan();
-
-//            updateCurrentWifi(scanResults);
-
         }
 
 //        //random data for testing listview
@@ -146,11 +143,9 @@ public class MainActivity extends AppCompatActivity {
         }
         Collections.sort(listNetwork, WifiDetail.COMPARE_BY_SIGNALSTRENGTH);
         adapter.notifyDataSetChanged();
-
-
     }
 
-    public void updateCurrentWifi(List<ScanResult> scanResults) {
+    private void updateCurrentWifi(List<ScanResult> scanResults) {
         Utils.checkWifiConnect(this, this);
         Utils.displayLocationSettingsRequest(this, this);
         boolean isConnectAP = Utils.isConnectAccessPoint(this);
@@ -173,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
                     if (Utils.convertSSID(wifiInfo.getSSID()).equals(network.SSID)) {
                         //get capabilities of current connection
                         String capabilities = network.capabilities;
-//                        Log.d("capab", capabilities);
+//                        Log.d("cap", capabilities);
 
                         if ((capabilities.contains("WPA2") ||
                                 capabilities.contains("WPA") ||
@@ -249,13 +244,10 @@ public class MainActivity extends AppCompatActivity {
                 switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
                         //Yes button clicked
-//                        Toast.makeText(getApplicationContext(), "yes ", Toast.LENGTH_LONG).show();
-//                        connectToWifi(adapter.getItem(position).getName());
-//                        doStart(adapter.getItem(position).getName());
                         Intent intent = new Intent(MainActivity.this, DialogMethodActivity.class);
                         intent.putExtra("SSID",adapter.getItem(position).getName());
                         startActivity(intent);
-                        Log.d("pz", "ssid: " + adapter.getItem(position).getName());
+                        Log.d("running", "ssid: " + adapter.getItem(position).getName());
                         break;
 
                     case DialogInterface.BUTTON_NEGATIVE:
@@ -275,7 +267,14 @@ public class MainActivity extends AppCompatActivity {
     @OnItemLongClick(R.id.lvNetworkList)
     boolean onItemLongClick(int position) {
         Toast.makeText(getApplicationContext(), "Long click " + position, Toast.LENGTH_LONG).show();
-
+        //connect to saved wifi
+        int netId = -1;
+        for (WifiConfiguration tmp : wifi.getConfiguredNetworks())
+            if (tmp.SSID.equals( "\""+adapter.getItem(position).getName()+"\""))
+            {
+                netId = tmp.networkId;
+                wifi.enableNetwork(netId, true);
+            }
         return true; //if return false, the onItemClick() will be invoked when touch up
     }
 
@@ -319,85 +318,4 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-//
-//    private void finallyConnect(String networkPass, String networkSSID) {
-//
-//        WifiConfiguration wifiConfig = new WifiConfiguration();
-//        wifiConfig.SSID = String.format("\"%s\"", networkSSID);
-//        wifiConfig.preSharedKey = String.format("\"%s\"", networkPass);
-//
-//        // remember id
-//        int netId = wifi.addNetwork(wifiConfig);
-//        wifi.disconnect();
-//        wifi.enableNetwork(netId, true);
-//        wifi.reconnect();
-//
-////        WifiConfiguration conf = new WifiConfiguration();
-////        conf.SSID = "\"\"" + networkSSID + "\"\"";
-////        conf.preSharedKey = "\"" + networkPass + "\"";
-////        wifi.addNetwork(conf);
-//
-//    }
-//
-//    private void connectToWifi(final String wifiSSID) {
-//        final Dialog dialog = new Dialog(this);
-//        dialog.setContentView(R.layout.connect);
-//        dialog.setTitle("Connect to Network");
-//        TextView textSSID = (TextView) dialog.findViewById(R.id.textSSID1);
-//
-//        Button dialogButton = (Button) dialog.findViewById(R.id.okButton);
-//        pass = (EditText) dialog.findViewById(R.id.textPassword);
-//        textSSID.setText(wifiSSID);
-//
-//        // if button is clicked, connect to the network;
-//        dialogButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                String checkPassword = pass.getText().toString();
-//                finallyConnect(checkPassword, wifiSSID);
-//                dialog.dismiss();
-//            }
-//        });
-//        dialog.show();
-//    }
-
-
-
-//    private class HackingTask extends AsyncTask<String, Integer, Integer> {
-//
-//        @Override
-//        protected Integer doInBackground(String... strings) {
-//            FindPassword bruteforce = new FindPassword();
-////            String[] test = {"88888888","123456789","222222","444444444","deophaihoi","thecoffeehouse"};
-//
-//            for (int length = bruteforce.min; length < bruteforce.max; length++) { // Change bruteforce.min and bruteforce.max for number of characters to bruteforce.
-////            for (int i = 0; i < test.length; i++){
-////                String testPass = test[i];
-////                Log.d("pz", testPass);
-//                bruteforce.generate("", 0, length); //prepend_string, pos, length
-//                finallyConnect(bruteforce.getPass(), strings[0]);
-//                Log.d("pz", bruteforce.getPass());
-////                finallyConnect(testPass,strings[0]);
-//                if (isCancelled()) {
-//                    Log.d("pz", "isCancelled");
-//                    break;
-//                }
-//                try {
-//                    Thread.sleep(2000);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//
-////                WifiInfo wifiInfo = wifi.getConnectionInfo();
-//                if (Utils.isConnectAccessPoint(getApplicationContext())) {
-////                    Log.d("pz", Utils.convertSSID(wifiInfo.getSSID()) + "/" +strings[0]+ " /pass: "+testPass);
-//                    break;
-//                }
-//
-//            }
-//
-//            return null;
-//        }
-//    }
 }

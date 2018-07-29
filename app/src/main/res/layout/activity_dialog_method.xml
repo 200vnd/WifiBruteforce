@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:padding="5dp"
+        android:padding="10dp"
         android:text="@string/brute_force_with_all_posible_passwords" />
 
     <TextView
@@ -20,7 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:padding="5dp"
+        android:padding="10dp"
         android:text="@string/brute_force_using_dictionary" />
 
     <Button
