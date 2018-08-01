@@ -3,32 +3,38 @@ package com.nguyen.wifibruteforce;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import java.util.ArrayList;
+
 class FindPassword {
     private char[] charset;
-
     public int min; //var added for min char length
     public int max; //var added for max char length
-    private String pass; //var added for max char length
+    public ArrayList<String> arrBFTemp; //5000 results of generate()
 
-    public String getPass() {
-        return pass;
-    }
+    private int countList = 0;
 
-    public void setPass(String pass) {
-        this.pass = pass;
-    }
+    //TODO: make getter setter
 
     public FindPassword() {
-        charset = "12".toCharArray();
-        min = 8; //char min start
-        max = 9; //char max end
+        charset = "abc".toCharArray();
+        //        charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
+//        charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_+=~`[]{}|\\:;\"'<>,.?/ ".toCharArray();
+        min = 3; //char min start
+        max = 5; //char max end (max - 1)
+        arrBFTemp = new ArrayList<>();
     }
 
-    public void generate(String str, int pos, int length) { //ex: str = ""; pos = 0; length = 2    charset="abc"
-
+    public void generate(String str, int pos, int length) {
+        if (countList == 50) {
+            Log.d("classs", "str: " + str);
+            Log.d("classs", "pos: " + pos);
+            Log.d("classs", "length: " + length);
+            return;
+        }
         if (length == 0) {
             System.out.println(str);
-            setPass(str);
+            arrBFTemp.add(str);
+            countList += 1;
         } else {
 
             //This if statement resets the char position back to the very first character in the character set ('a'), which makes this a complete solution to an all combinations bruteforce!
@@ -37,17 +43,10 @@ class FindPassword {
             }
 
             for (int i = pos; i < charset.length; i++) {
+
 //                System.out.println(i + "///" +(length));
                 generate(str + charset[i], i, length - 1);
 
-//                System.out.println(i + "/" +(length));
-//                if ((str + charset[i]).equals("GTU")) {
-//                    System.out.println("0000000000000000000000+++++++++++++++++++++++");
-//                    break;
-//                }
-
-//                System.out.println("------------------------------------------------------"+str);
-//                System.out.println(pos + "-*-*-" + length);
             }
         }
 

@@ -1,21 +1,15 @@
 package com.nguyen.wifibruteforce;
 
-import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.location.LocationManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
-import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
@@ -27,15 +21,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.codekidlabs.storagechooser.StorageChooser;
-import com.codekidlabs.storagechooser.utils.DiskUtil;
 import com.nguyen.wifibruteforce.adapter.WifiListAdapter;
 import com.nguyen.wifibruteforce.model.WifiDetail;
 
@@ -244,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
                 switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
                         //Yes button clicked
-                        Intent intent = new Intent(MainActivity.this, DialogMethodActivity.class);
+                        Intent intent = new Intent(MainActivity.this, DialogChooseMethodActivity.class);
                         intent.putExtra("SSID",adapter.getItem(position).getName());
                         startActivity(intent);
                         Log.d("running", "ssid: " + adapter.getItem(position).getName());
@@ -287,6 +278,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         registerReceiver(wifiScanReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+        updateListNetworks();
         super.onResume();
     }
 

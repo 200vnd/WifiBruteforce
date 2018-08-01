@@ -10,7 +10,7 @@
     <string name="tried_passwords">Tried Passwords:</string>
     <string name="stop">Stop</string>
     <string name="cancel">Cancel</string>
-    <string name="brute_force_with_all_posible_passwords">Brute force with all posible passwords</string>
+    <string name="brute_force_with_all_possible_passwords">Brute force with all possible passwords</string>
     <string name="brute_force_using_dictionary">Brute force using dictionary</string>
     <string name="file_not_found">File not found!</string>
     <string name="IOException">Error, Please try again!</string>

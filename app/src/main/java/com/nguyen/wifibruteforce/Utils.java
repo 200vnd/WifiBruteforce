@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -78,13 +80,38 @@ public class Utils {
     }
 
     public static boolean isConnectAccessPoint(Context context) {
-        WifiManager wifiMgr = (WifiManager) context.getApplicationContext().getSystemService(WIFI_SERVICE);
-        WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
-        if (wifiInfo.getNetworkId() == -1) {
-            return false; // Not connected to an access point
-        } else
+//        ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+//        NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+//
+//        if (mWifi.isConnected()) {
+//            // Do whatever
+//            return true;
+//        }else
+//            return false;
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        assert cm != null;
+        NetworkInfo ni = cm.getActiveNetworkInfo();
+//        Log.d("running", "compareTo: "+ni.getDetailedState().compareTo(NetworkInfo.DetailedState.CONNECTED));
+        if (ni != null
+                && ni.getDetailedState().compareTo(NetworkInfo.DetailedState.CONNECTED) == 0
+                && ni.getType() == ConnectivityManager.TYPE_WIFI) {
+            Log.d("running", "isCAP: " + ni.toString());
             return true;
+        } else {
+//            Log.d("running", "!isCAP");
+            return false;
+        }
     }
+//    public static boolean isConnectAccessPoint(Context context) {
+//        WifiManager wifiMgr = (WifiManager) context.getApplicationContext().getSystemService(WIFI_SERVICE);
+//        assert wifiMgr != null;
+//        WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
+////        if (wifiInfo.getNetworkId() == -1) {
+////            return false; // Not connected to an access point
+////        } else
+////            return true;
+//        return wifiInfo.getNetworkId() != -1;
+//    }
 
     public static void displayLocationSettingsRequest(Context context, final Activity activity) {
         requestLocationPermission(context, activity);
@@ -123,7 +150,7 @@ public class Utils {
                         }
                         break;
                     case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        Log.i(TAG, "Location settings are inadequate, and cannot be fixed here. DialogActivity not created.");
+                        Log.i(TAG, "Location settings are inadequate, and cannot be fixed here. DialogTaskActivity not created.");
                         break;
                 }
             }

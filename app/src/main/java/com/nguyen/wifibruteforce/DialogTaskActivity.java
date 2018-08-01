@@ -2,7 +2,6 @@ package com.nguyen.wifibruteforce;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,11 +20,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class DialogActivity extends Activity {
+public class DialogTaskActivity extends Activity {
 
     @BindView(R.id.btnCancel)
     Button btnStop;
-    DictionaryTask hackingTask;
+    DictionaryTask dictionaryTask;
+    BruteForceTask bruteForceTask;
     int flag;
 
     @Override
@@ -84,12 +84,18 @@ public class DialogActivity extends Activity {
     }
 
     private void doStart(String ssid, ArrayList<String> listPass, int flag) {
+        /*
+        flag == 0: dictionary
+        flag == 1: brute force
+        */
         if (flag == 0) {
-            hackingTask = new DictionaryTask(DialogActivity.this);
-            hackingTask.setArrPass(listPass);
-            hackingTask.execute(ssid);
+            dictionaryTask = new DictionaryTask(DialogTaskActivity.this);
+            dictionaryTask.setArrPass(listPass);
+            dictionaryTask.execute(ssid);
         } else if (flag == 1) {
             Log.d("running", "method bf " + ssid);
+            bruteForceTask = new BruteForceTask(DialogTaskActivity.this);
+            bruteForceTask.execute(ssid);
 
         } else {
             Log.e("running", "some thing wrong");
@@ -99,9 +105,9 @@ public class DialogActivity extends Activity {
 
     private void doStop(int flag) {
         if (flag == 0) {
-            if (hackingTask != null && hackingTask.getStatus() != AsyncTask.Status.FINISHED)
-                hackingTask.cancel(true);
-            if (hackingTask.isCancelled()) {
+//            if (dictionaryTask != null && dictionaryTask.getStatus() != AsyncTask.Status.FINISHED)
+            dictionaryTask.cancel(true);
+            if (dictionaryTask.isCancelled()) {
 //            Log.d("running", "task cancel");
                 finish();
             }

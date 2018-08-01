@@ -17,7 +17,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class DialogMethodActivity extends Activity {
+public class DialogChooseMethodActivity extends Activity {
 
     @BindView(R.id.txtMethodBF)
     TextView txtMethodBF;
@@ -43,7 +43,7 @@ public class DialogMethodActivity extends Activity {
     @OnClick(R.id.txtMethodBF)
     public void onTxtMethodBFClicked() {
         Toast.makeText(getApplicationContext(), "Brute force", Toast.LENGTH_LONG).show();
-        Intent i = new Intent(DialogMethodActivity.this, DialogActivity.class);
+        Intent i = new Intent(DialogChooseMethodActivity.this, DialogTaskActivity.class);
         i.putExtra("SSID", ssid);
         startActivity(i);
         finish();
@@ -53,12 +53,12 @@ public class DialogMethodActivity extends Activity {
     public void onTxtMethodDicClicked() {
         Toast.makeText(getApplicationContext(), "Choose a dictionary (.txt)", Toast.LENGTH_LONG).show();
 
-        Utils.requestStoragePermission(DialogMethodActivity.this);
+        Utils.requestStoragePermission(DialogChooseMethodActivity.this);
         ArrayList<String> t = new ArrayList<>();    //custom file type
         t.add("txt");
         //choose file from storage (use library)
         StorageChooser chooser = new StorageChooser.Builder()
-                .withActivity(DialogMethodActivity.this)
+                .withActivity(DialogChooseMethodActivity.this)
                 .withMemoryBar(true)
                 .withFragmentManager(getFragmentManager())
                 .allowCustomPath(true)
@@ -70,7 +70,7 @@ public class DialogMethodActivity extends Activity {
             @Override
             public void onSelect(String s) {
                 Log.e("SELECTED_PATH", s);
-                Intent i = new Intent(DialogMethodActivity.this, DialogActivity.class);
+                Intent i = new Intent(DialogChooseMethodActivity.this, DialogTaskActivity.class);
                 i.putExtra("SSID", ssid);
                 i.putExtra("PATH", s);
                 startActivity(i);
