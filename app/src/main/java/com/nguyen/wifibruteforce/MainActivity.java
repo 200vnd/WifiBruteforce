@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -84,6 +85,14 @@ public class MainActivity extends AppCompatActivity {
 
         updateListNetworks();
         myPullToRefresh();
+
+//        lvNetworkList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+//            @Override
+//            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+//                Toast.makeText(getApplicationContext(), "Long click " + position, Toast.LENGTH_LONG).show();
+//                return false;
+//            }
+//        });
     }
 
     private void updateListNetworks() {
@@ -236,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
                     case DialogInterface.BUTTON_POSITIVE:
                         //Yes button clicked
                         Intent intent = new Intent(MainActivity.this, DialogChooseMethodActivity.class);
-                        intent.putExtra("SSID",adapter.getItem(position).getName());
+                        intent.putExtra("SSID", adapter.getItem(position).getName());
                         startActivity(intent);
                         Log.d("running", "ssid: " + adapter.getItem(position).getName());
                         break;
@@ -255,17 +264,28 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
+//    @OnItemLongClick(R.id.lvNetworkList)
+//    boolean onItemLongClick(int position) {
+//        Toast.makeText(getApplicationContext(), adapter.getItem(position).getName() +" /Long click " + position, Toast.LENGTH_LONG).show();
+//        return true;
+//    }
+
     @OnItemLongClick(R.id.lvNetworkList)
     boolean onItemLongClick(int position) {
         Toast.makeText(getApplicationContext(), "Long click " + position, Toast.LENGTH_LONG).show();
         //connect to saved wifi
         int netId = -1;
-        for (WifiConfiguration tmp : wifi.getConfiguredNetworks())
-            if (tmp.SSID.equals( "\""+adapter.getItem(position).getName()+"\""))
-            {
-                netId = tmp.networkId;
-                wifi.enableNetwork(netId, true);
-            }
+        wifi = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+        if (wifi.getConfiguredNetworks() != null) {
+            System.out.println(adapter.getItem(position).getName());
+        }
+//        assert wifi != null;
+//        for (WifiConfiguration tmp : wifi.getConfiguredNetworks()) {
+//            if (Utils.convertSSID(tmp.SSID).equals(adapter.getItem(position).getName())) {
+//                netId = tmp.networkId;
+//                wifi.enableNetwork(netId, true);
+//            }
+//        }
         return true; //if return false, the onItemClick() will be invoked when touch up
     }
 

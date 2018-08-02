@@ -4,18 +4,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.codekidlabs.storagechooser.StorageChooser;
 
 import java.util.ArrayList;
 
-import static android.content.Context.WIFI_SERVICE;
 
 public class DictionaryTask extends AsyncTask<String, Integer, Integer> {
     private Activity activity;

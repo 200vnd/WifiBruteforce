@@ -113,6 +113,11 @@ public class DialogTaskActivity extends Activity {
             }
         } else {
             Log.d("running", "doStop flag !=0");
+            bruteForceTask.cancel(true);
+            if (bruteForceTask.isCancelled()) {
+//            Log.d("running", "task cancel");
+                finish();
+            }
             finish();
         }
     }
