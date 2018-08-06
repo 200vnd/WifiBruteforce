@@ -275,17 +275,18 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), "Long click " + position, Toast.LENGTH_LONG).show();
         //connect to saved wifi
         int netId = -1;
-        wifi = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
-        if (wifi.getConfiguredNetworks() != null) {
-            System.out.println(adapter.getItem(position).getName());
-        }
-//        assert wifi != null;
-//        for (WifiConfiguration tmp : wifi.getConfiguredNetworks()) {
-//            if (Utils.convertSSID(tmp.SSID).equals(adapter.getItem(position).getName())) {
-//                netId = tmp.networkId;
-//                wifi.enableNetwork(netId, true);
-//            }
+//        wifi = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+//        if (wifi.getConfiguredNetworks() != null) {
+//            System.out.println(adapter.getItem(position).getName());
 //        }
+        assert wifi != null;
+        for (WifiConfiguration tmp : wifi.getConfiguredNetworks()) {
+            if (Utils.convertSSID(tmp.SSID).equals(adapter.getItem(position).getName())) {
+                netId = tmp.networkId;
+                wifi.enableNetwork(netId, true);
+                break;
+            }
+        }
         return true; //if return false, the onItemClick() will be invoked when touch up
     }
 

@@ -51,33 +51,40 @@ public class DialogChooseMethodActivity extends Activity {
 
     @OnClick(R.id.txtMethodDic)
     public void onTxtMethodDicClicked() {
-        Toast.makeText(getApplicationContext(), "Choose a dictionary (.txt)", Toast.LENGTH_LONG).show();
-
-        Utils.requestStoragePermission(DialogChooseMethodActivity.this);
-        ArrayList<String> t = new ArrayList<>();    //custom file type
-        t.add("txt");
-        //choose file from storage (use library)
-        StorageChooser chooser = new StorageChooser.Builder()
-                .withActivity(DialogChooseMethodActivity.this)
-                .withMemoryBar(true)
-                .withFragmentManager(getFragmentManager())
-                .allowCustomPath(true)
-                .customFilter(t)
-                .setType(StorageChooser.FILE_PICKER)
-                .build();
-        chooser.show();
-        chooser.setOnSelectListener(new StorageChooser.OnSelectListener() {
-            @Override
-            public void onSelect(String s) {
-                Log.e("SELECTED_PATH", s);
-                Intent i = new Intent(DialogChooseMethodActivity.this, DialogTaskActivity.class);
-                i.putExtra("SSID", ssid);
-                i.putExtra("PATH", s);
-                startActivity(i);
-                finish();
-            }
-        });
-
+        if (SettingActivity.flagSwitchDefaultDic) {
+            Toast.makeText(getApplicationContext(), "Use default dictionary", Toast.LENGTH_LONG).show();
+            Intent i = new Intent(DialogChooseMethodActivity.this, DialogTaskActivity.class);
+            i.putExtra("SSID", ssid);
+            i.putExtra("PATH", "default_path");
+            startActivity(i);
+            finish();
+        }else {
+            Toast.makeText(getApplicationContext(), "Choose a dictionary (.txt)", Toast.LENGTH_LONG).show();
+            Utils.requestStoragePermission(DialogChooseMethodActivity.this);
+            ArrayList<String> t = new ArrayList<>();    //custom file type
+            t.add("txt");
+            //choose file from storage (use library)
+            StorageChooser chooser = new StorageChooser.Builder()
+                    .withActivity(DialogChooseMethodActivity.this)
+                    .withMemoryBar(true)
+                    .withFragmentManager(getFragmentManager())
+                    .allowCustomPath(true)
+                    .customFilter(t)
+                    .setType(StorageChooser.FILE_PICKER)
+                    .build();
+            chooser.show();
+            chooser.setOnSelectListener(new StorageChooser.OnSelectListener() {
+                @Override
+                public void onSelect(String s) {
+                    Log.e("SELECTED_PATH", s);
+                    Intent i = new Intent(DialogChooseMethodActivity.this, DialogTaskActivity.class);
+                    i.putExtra("SSID", ssid);
+                    i.putExtra("PATH", s);
+                    startActivity(i);
+                    finish();
+                }
+            });
+        }
     }
 
     @OnClick(R.id.btnMethodCancel)

@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Wifi Brute-force Tool</string>
     <string name="refresh">Refresh</string>
-    <string name="setting">Setting</string>
+    <string name="settings">Settings</string>
     <string name="wifiName">Wifi Name</string>
     <string name="normalBruteforce">Use normal brute-force method</string>
     <string name="dictionary">Use dictionary method</string>
@@ -15,4 +15,6 @@
     <string name="file_not_found">File not found!</string>
     <string name="IOException">Error, Please try again!</string>
     <string name="pass_found">Password found: </string>
+    <string name="use_default_dictionary">Use default dictionary</string>
+    <string name="done">Done</string>
 </resources>

@@ -57,7 +57,8 @@ public class BruteForceTask extends AsyncTask<String, Integer, Integer> {
         String check1 = "";
         String testPass;
 
-        outerloop:      //set label for loop (break [label]; - break the labeled loop)
+        //set label for loop (break [label]; - break the labeled loop)
+        outerloop:
         for (int length = getLengthMin(); length <= getLengthMax(); length++) {
             final double NUMBER_OF_PERMUTATIONS = Math.pow(charset.length, length);
 
@@ -117,8 +118,8 @@ public class BruteForceTask extends AsyncTask<String, Integer, Integer> {
     @Override
     protected void onProgressUpdate(Integer... values) {
         super.onProgressUpdate(values);
-        TextView txtPassCout = activity.findViewById(R.id.txtPassCount);
-        txtPassCout.setText(values[0] + "");
+        TextView txtPassCount = activity.findViewById(R.id.txtPassCount);
+        txtPassCount.setText(values[0] + "");
     }
 
 

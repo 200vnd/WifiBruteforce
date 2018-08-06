@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -44,11 +45,16 @@ public class DialogTaskActivity extends Activity {
             Toast.makeText(getApplicationContext(), "dic", Toast.LENGTH_LONG).show();
             Log.d("running", intent.getStringExtra("PATH"));
 
+            ArrayList<String> listPass ;
             String path = intent.getStringExtra("PATH");
-            ArrayList<String> ListPass = read(path);
-
+            if (path.equals("default_path")) {
+                Log.d("running", "file path default");
+                listPass = readDefault();
+            }else {
+                listPass = read(path);
+            }
             flag = 0;
-            doStart(ssid, ListPass, flag);
+            doStart(ssid, listPass, flag);
 
         } else {                //brute force method
             flag = 1;
@@ -57,7 +63,32 @@ public class DialogTaskActivity extends Activity {
         }
     }
 
-    //2 types of reading file to arraylist
+    private ArrayList readDefault() {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(getAssets().open("pass_dictionary_test.txt")))) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                ArrayList arrPass = new ArrayList(Arrays.asList(br.lines().toArray()));
+                br.close();
+                return arrPass;
+            } else {
+                String line;
+                ArrayList arrPass = new ArrayList();
+                while ((line = br.readLine()) != null) {
+                    arrPass.add(line);
+                }
+                br.close();
+                return arrPass;
+            }
+        } catch (FileNotFoundException e) {
+            Log.e("readFile", "not found");
+            Toast.makeText(getApplicationContext(), getString(R.string.file_not_found), Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            Log.e("readFile", "IOEx");
+            Toast.makeText(getApplicationContext(), getString(R.string.IOException), Toast.LENGTH_LONG).show();
+        }
+        return null;
+    }
+
+    //2 types of reading file to arraylist (FileReader)
     private ArrayList read(String path) {
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
