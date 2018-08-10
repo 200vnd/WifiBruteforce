@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
@@ -308,7 +310,22 @@ public class MainActivity extends AppCompatActivity {
             List<ScanResult> results = wifi.getScanResults();
             updateCurrentWifi(results);
             scanWifi(results);
-
+            Log.d("running", "bcr: " + intent.getAction());
+            if(intent.getAction().equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
+                NetworkInfo networkInfo =
+                        intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+                if(networkInfo.isConnected()) {
+                    // Wifi is connected
+                    Log.d("Inetify", "Wifi is connected: " + String.valueOf(networkInfo));
+                }
+            } else if(intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+                NetworkInfo networkInfo =
+                        intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+                if(networkInfo.getDetailedState() == NetworkInfo.DetailedState.DISCONNECTED) {
+                    // Wifi is disconnected
+                    Log.d("Inetify", "Wifi is disconnected: " + String.valueOf(networkInfo));
+                }
+            }
         }
     }
 

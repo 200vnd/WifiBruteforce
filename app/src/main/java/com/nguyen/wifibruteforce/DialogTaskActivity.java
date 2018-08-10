@@ -1,7 +1,14 @@
 package com.nguyen.wifibruteforce;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,18 +23,21 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class DialogTaskActivity extends Activity {
+public class DialogTaskActivity extends Activity  {
 
     @BindView(R.id.btnCancel)
     Button btnStop;
     DictionaryTask dictionaryTask;
     BruteForceTask bruteForceTask;
     int flag;
+
+    WifiScanReceiver2 wifiScanReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,4 +168,53 @@ public class DialogTaskActivity extends Activity {
     public void onViewClicked() {
         doStop(flag);
     }
+
+//    @Override
+//    public void onNetworkConnectionChanged(boolean isConnected) {
+//        Log.d("running","supplicant task: "+)
+//
+//    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+
+    }
+
+    public class WifiScanReceiver2 extends BroadcastReceiver {
+        public void onReceive(Context c, Intent intent) {
+//            List<ScanResult> results = wifi.getScanResults();
+//            updateCurrentWifi(results);
+//            scanWifi(results);
+            Log.d("running", "bcr: " + intent.toString());
+            if(intent.getAction().equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
+                NetworkInfo networkInfo =
+                        intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+                if(networkInfo.isConnected()) {
+                    // Wifi is connected
+                    Log.d("running Inetify", "Wifi is connected: " + String.valueOf(networkInfo));
+                }
+            } else if(intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+                NetworkInfo networkInfo =
+                        intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+                if(networkInfo.getDetailedState() == NetworkInfo.DetailedState.DISCONNECTED) {
+                    // Wifi is disconnected
+                    Log.d("running Inetify", "Wifi is disconnected: " + String.valueOf(networkInfo));
+                }
+            }
+        }
+    }
+
+//    @Override
+//    protected void onPause() {
+//        unregisterReceiver(wifiScanReceiver);
+//        super.onPause();
+//    }
+
+//    @Override
+//    protected void onResume() {
+//        // register connection status listener
+//        super.onResume();
+//        MyApplication.getInstance().setConnectivityListener(this);
+//
+//    }
 }

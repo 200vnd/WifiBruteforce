@@ -88,6 +88,10 @@ public class Utils {
 //            return true;
 //        }else
 //            return false;
+//        WifiManager wifiMgr = (WifiManager) context.getApplicationContext().getSystemService(WIFI_SERVICE);
+//        assert wifiMgr != null;
+//        WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
+//        Log.d("running", "supplicant: "+String.valueOf(wifiInfo.getSupplicantState()));
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         assert cm != null;
         NetworkInfo ni = cm.getActiveNetworkInfo();
@@ -220,6 +224,7 @@ public class Utils {
 //        conf.preSharedKey = "\"" + networkPass + "\"";
 //        wifiManager.addNetwork(conf);
 //
+
 
     }
 

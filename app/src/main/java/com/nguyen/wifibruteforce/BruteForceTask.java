@@ -4,10 +4,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.SupplicantState;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import static android.content.Context.WIFI_SERVICE;
 
 
 public class BruteForceTask extends AsyncTask<String, Integer, Integer> {
@@ -87,6 +92,14 @@ public class BruteForceTask extends AsyncTask<String, Integer, Integer> {
                             Log.d("running", "isCancelled_BF");
                             break outerloop;
                         }
+//                        WifiManager wifiMgr = (WifiManager) activity.getApplicationContext().getSystemService(WIFI_SERVICE);
+//                        assert wifiMgr != null;
+//                        WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
+//                        Log.d("running", "supplicant1: "+String.valueOf(wifiInfo.getSupplicantState()));
+//                        if (wifiInfo.getSupplicantState() == SupplicantState.ASSOCIATING) {
+//                            break outerloop;
+//                        }
+
                         try {
                             Thread.sleep(9000);
                         } catch (InterruptedException e) {
