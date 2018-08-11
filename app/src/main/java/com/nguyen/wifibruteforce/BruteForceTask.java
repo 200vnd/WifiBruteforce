@@ -92,18 +92,20 @@ public class BruteForceTask extends AsyncTask<String, Integer, Integer> {
                             Log.d("running", "isCancelled_BF");
                             break outerloop;
                         }
-//                        WifiManager wifiMgr = (WifiManager) activity.getApplicationContext().getSystemService(WIFI_SERVICE);
-//                        assert wifiMgr != null;
-//                        WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
-//                        Log.d("running", "supplicant1: "+String.valueOf(wifiInfo.getSupplicantState()));
-//                        if (wifiInfo.getSupplicantState() == SupplicantState.ASSOCIATING) {
-//                            break outerloop;
-//                        }
 
                         try {
-                            Thread.sleep(9000);
+                            int countSleep = 0;
+                            while (countSleep < 9 && ConnectivityReceiver.group_handshake != 1) {
+                                Thread.sleep(1000);
+                                countSleep++;
+                            }
                         } catch (InterruptedException e) {
                             e.printStackTrace();
+                        }
+                        if (ConnectivityReceiver.group_handshake == 1) {
+                            Log.d("running", "success: " + testPass);
+                            foundPass = testPass;
+                            break outerloop;
                         }
 
                         ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);

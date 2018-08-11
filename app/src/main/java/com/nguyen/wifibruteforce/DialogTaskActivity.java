@@ -38,6 +38,7 @@ public class DialogTaskActivity extends Activity  {
     int flag;
 
     WifiScanReceiver2 wifiScanReceiver;
+    ConnectivityReceiver connectivityReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +51,7 @@ public class DialogTaskActivity extends Activity  {
         Intent intent = getIntent();
         String ssid = intent.getStringExtra("SSID");
 
+        connectivityReceiver = new ConnectivityReceiver();
 
         if (getIntent().hasExtra("PATH")) {             //dictionary method
             Toast.makeText(getApplicationContext(), "dic", Toast.LENGTH_LONG).show();
@@ -206,15 +208,15 @@ public class DialogTaskActivity extends Activity  {
 
 //    @Override
 //    protected void onPause() {
-//        unregisterReceiver(wifiScanReceiver);
+//        unregisterReceiver(connectivityReceiver);
 //        super.onPause();
 //    }
-
+//
 //    @Override
 //    protected void onResume() {
 //        // register connection status listener
 //        super.onResume();
-//        MyApplication.getInstance().setConnectivityListener(this);
+//        registerReceiver(connectivityReceiver, new IntentFilter(WifiManager.EXTRA_WIFI_STATE));
 //
 //    }
 }

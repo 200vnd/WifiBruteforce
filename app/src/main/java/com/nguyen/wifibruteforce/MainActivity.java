@@ -1,10 +1,12 @@
 package com.nguyen.wifibruteforce;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -70,8 +72,6 @@ public class MainActivity extends AppCompatActivity {
     WifiDetail wifiDetail;
     WifiScanReceiver wifiScanReceiver;
 
-    EditText pass;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,13 +88,6 @@ public class MainActivity extends AppCompatActivity {
         updateListNetworks();
         myPullToRefresh();
 
-//        lvNetworkList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-//            @Override
-//            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-//                Toast.makeText(getApplicationContext(), "Long click " + position, Toast.LENGTH_LONG).show();
-//                return false;
-//            }
-//        });
     }
 
     private void updateListNetworks() {
@@ -108,23 +101,6 @@ public class MainActivity extends AppCompatActivity {
             wifi.startScan();
         }
 
-//        //random data for testing listview
-//        for (int j = 0; j < 20; j++) {
-//            Random random = new Random();
-//            int x = random.nextInt(4) + 1;
-//            WifiDetail n = new WifiDetail();
-//            n.setName("wifi" + j);
-//            n.setSignalLevel(x);
-////            n.setSignalIcon();
-//            listNetwork.add(n);
-//        }
-//
-//        for (int i = 0; i < listNetwork.size(); i++) {
-//            listNetwork.get(i).setSignalIcon();
-//        }
-
-//        Collections.sort(listNetwork, WifiDetail.COMPARE_BY_SIGNALSTRENGTH);
-//        adapter.notifyDataSetChanged();
     }
 
     private void scanWifi(List<ScanResult> scanResults) {
@@ -193,8 +169,7 @@ public class MainActivity extends AppCompatActivity {
             imgSignalDetail.setImageResource(wifiCurrentDetail.getSignalIcon());
 
         } else
-            constraint.setVisibility(View.GONE); //remove/hide view of current connected wifi info
-
+            constraint.setVisibility(View.GONE); // remove/hide view of current connected wifi info
 
     }
 
@@ -266,11 +241,6 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
-//    @OnItemLongClick(R.id.lvNetworkList)
-//    boolean onItemLongClick(int position) {
-//        Toast.makeText(getApplicationContext(), adapter.getItem(position).getName() +" /Long click " + position, Toast.LENGTH_LONG).show();
-//        return true;
-//    }
 
     @OnItemLongClick(R.id.lvNetworkList)
     boolean onItemLongClick(int position) {
@@ -293,6 +263,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        disableBroadcastReceiver();
+    }
+
+    @Override
     protected void onPause() {
         unregisterReceiver(wifiScanReceiver);
         super.onPause();
@@ -300,9 +276,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
+        super.onResume();
         registerReceiver(wifiScanReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         updateListNetworks();
-        super.onResume();
+        enableBroadcastReceiver();
     }
 
     public class WifiScanReceiver extends BroadcastReceiver {
@@ -310,23 +287,31 @@ public class MainActivity extends AppCompatActivity {
             List<ScanResult> results = wifi.getScanResults();
             updateCurrentWifi(results);
             scanWifi(results);
-            Log.d("running", "bcr: " + intent.getAction());
-            if(intent.getAction().equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
-                NetworkInfo networkInfo =
-                        intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
-                if(networkInfo.isConnected()) {
-                    // Wifi is connected
-                    Log.d("Inetify", "Wifi is connected: " + String.valueOf(networkInfo));
-                }
-            } else if(intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
-                NetworkInfo networkInfo =
-                        intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
-                if(networkInfo.getDetailedState() == NetworkInfo.DetailedState.DISCONNECTED) {
-                    // Wifi is disconnected
-                    Log.d("Inetify", "Wifi is disconnected: " + String.valueOf(networkInfo));
-                }
-            }
+
         }
+    }
+
+    public void enableBroadcastReceiver()
+    {
+
+        ComponentName receiver = new ComponentName(this, ConnectivityReceiver.class);
+        PackageManager pm = this.getPackageManager();
+
+        pm.setComponentEnabledSetting(receiver,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
+        Toast.makeText(this, "Enabled broadcast receiver", Toast.LENGTH_SHORT).show();
+    }
+    /**
+     * This method disables the Broadcast receiver registered in the AndroidManifest file.
+     */
+    public void disableBroadcastReceiver(){
+        ComponentName receiver = new ComponentName(this, ConnectivityReceiver.class);
+        PackageManager pm = this.getPackageManager();
+        pm.setComponentEnabledSetting(receiver,
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP);
+        Toast.makeText(this, "Disabled broadcast receiver", Toast.LENGTH_SHORT).show();
     }
 
     @Override

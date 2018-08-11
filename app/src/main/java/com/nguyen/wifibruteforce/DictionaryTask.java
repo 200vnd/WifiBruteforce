@@ -58,48 +58,35 @@ public class DictionaryTask extends AsyncTask<String, Integer, Integer> {
             }
 
 
-            WifiManager wifiMgr = (WifiManager) activity.getApplicationContext().getSystemService(WIFI_SERVICE);
-            assert wifiMgr != null;
-            WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
-            Log.d("running", "supplicant1: "+String.valueOf(wifiInfo.getSupplicantState()));
-            if (wifiInfo.getSupplicantState() == SupplicantState.ASSOCIATING) {
-                break;
-            }
-//            try
-//                demtgian=0
-//                while (demtgianngu=9||){
-//                    .sleep(1000)
-//                            demtgiangu++;
-////                }
+//            WifiManager wifiMgr = (WifiManager) activity.getApplicationContext().getSystemService(WIFI_SERVICE);
+//            assert wifiMgr != null;
+//            WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
+//            Log.d("running", "supplicant1: " + String.valueOf(wifiInfo.getSupplicantState()));
+//            if (wifiInfo.getSupplicantState() == SupplicantState.ASSOCIATING) {
+//                break;
+//            }
+
             try {
-                int demtgngu = 0;
-                while (demtgngu<9&&ConnectivityReceiver.group_handshake != 1){
+                int countSleep = 0;
+                while (countSleep < 9 && ConnectivityReceiver.group_handshake != 1) {
                     Thread.sleep(1000);
-                    demtgngu++;
+                    countSleep++;
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             if (ConnectivityReceiver.group_handshake == 1) {
-//                Log.d("running", Utils.convertSSID(ni.getExtraInfo()) + "/" + strings[0] + "/pass: " + testPass);
                 Log.d("running", "success: " + testPass);
                 foundPass = testPass;
                 break;
             }
-//            if (wifiInfo.getSupplicantState() == SupplicantState.COMPLETED) {
-//                break;
-//            }
-
-//            Log.d("running", "supplicant2: "+String.valueOf(wifiInfo.getSupplicantState()));
 
             ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
             assert cm != null;
             NetworkInfo ni = cm.getActiveNetworkInfo();
 
 
-
             if (Utils.isConnectAccessPoint(activity.getApplicationContext())
-//                    && wifiInfo.getSupplicantState() == SupplicantState.GROUP_HANDSHAKE
                     && Utils.convertSSID(ni.getExtraInfo()).equals(strings[0])) {
                 Log.d("running", Utils.convertSSID(ni.getExtraInfo()) + "/" + strings[0] + "/pass: " + testPass);
                 foundPass = testPass;
@@ -123,6 +110,7 @@ public class DictionaryTask extends AsyncTask<String, Integer, Integer> {
     @Override
     protected void onPostExecute(Integer integer) {
         super.onPostExecute(integer);
+//        ConnectivityReceiver.group_handshake = 0;
         Toast.makeText(activity.getApplicationContext(), activity.getString(R.string.pass_found) + foundPass, Toast.LENGTH_LONG).show();
         activity.finish();
     }
